@@ -8,8 +8,6 @@ use this application**, and hopefully have fun doing it.
 
 Things being worked on:
 
--Changing the scale of the icons to fit within the box.
-
 -Changing methods so that chess pieces cannot move through a piece
 
 -Checking for a check/checkmate
