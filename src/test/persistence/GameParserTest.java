@@ -1,4 +1,4 @@
-package test.persistence;
+package persistence;
 
 import model.*;
 import org.json.simple.JSONArray;

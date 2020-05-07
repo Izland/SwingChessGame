@@ -1,4 +1,4 @@
-package test.persistence;
+package persistence;
 
 import model.Board;
 import model.ChessPiece;
