@@ -127,16 +127,16 @@ public class TilePanel extends JPanel {
             ChessPiece cp = tile.getOccupyingPiece();
             String colorLetter = cp.getColour().substring(0, 1);
             String type = cp.getPieceType();
-            try {
-                BufferedImage img = ImageIO.read(new File("data/" + colorLetter + "_" + type + ".png"));
-                JLabel iconLabel = new JLabel(new ImageIcon(img));
-                iconLabel.setPreferredSize(tileDimension);
-                add(iconLabel);
-                revalidate();
-                repaint();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+
+            ImageIcon imageIcon = new ImageIcon("data/" + colorLetter + "_" + type + ".png");
+            Image image = imageIcon.getImage(); // transform it
+            Image newimg = image.getScaledInstance(62, 62,  java.awt.Image.SCALE_SMOOTH);
+            imageIcon = new ImageIcon(newimg);
+
+            JLabel iconLabel = new JLabel(imageIcon);
+            add(iconLabel);
+            revalidate();
+            repaint();
         }
     }
 }
