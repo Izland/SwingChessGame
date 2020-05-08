@@ -62,6 +62,7 @@ public class  GameFrame extends JFrame {
 
     // EFFECTS: Initializes and sets the sizes of each panel
     private void configurePanels(Game game) {
+
         boardPanel = new BoardPanel(this, game);
         boardPanel.setPreferredSize(new Dimension(500, 500));
         boardPanel.setMaximumSize(new Dimension(500, 500));
@@ -74,8 +75,9 @@ public class  GameFrame extends JFrame {
     }
 
     // MODIFIES: this
-    // EFFECTS: Places the boardPanel above the gameInfoPanel in the GameFrame window
+    // EFFECTS: Removes all panels from frame before placing panels in desired positions
     private void placePanels() {
+        this.getContentPane().removeAll();
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -85,7 +87,6 @@ public class  GameFrame extends JFrame {
         gbc.gridy = 1;
         this.getContentPane().add(gameInfoPanel, gbc);
     }
-
     public BoardPanel getBoardPanel() {
         return boardPanel;
     }
