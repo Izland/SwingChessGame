@@ -11,11 +11,13 @@ import static org.junit.jupiter.api.Assertions.*;
 // Tests for King Class
 class KingTest {
 
+    Board testBoard;
     King testKing;
 
     @BeforeEach
     public void setup() {
-        testKing = new King("E2", "white");
+        testBoard = new Board();
+        testKing = new King(testBoard,"E2", "white");
     }
 
     @Test

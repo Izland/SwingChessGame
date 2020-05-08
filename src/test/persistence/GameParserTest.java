@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 // Tests for GameParser class
 public class GameParserTest {
 
+    Board testBoard;
     Game testGame;
     JSONArray pieceJsonArray;
     JSONArray playerJsonArray;
@@ -20,6 +21,7 @@ public class GameParserTest {
 
     @BeforeEach
      public void setup () {
+        testBoard = new Board();
         pieceJsonArray = new JSONArray();
         playerJsonArray = new JSONArray();
 
@@ -86,7 +88,7 @@ public class GameParserTest {
 
     @Test
     public void testGenPiece() {
-        ChessPiece testPiece = GameParser.genPiece("bishop", "bishop1", "C1", "white");
+        ChessPiece testPiece = GameParser.genPiece(testBoard, "bishop", "bishop1", "C1", "white");
         assertEquals(model.Bishop.class, testPiece.getClass());
         assertEquals("bishop", testPiece.getPieceType());
         assertEquals("bishop1", testPiece.getPieceID());
@@ -96,7 +98,7 @@ public class GameParserTest {
 
     @Test
     public void testGenChessPieceArrayList() {
-        ArrayList<ChessPiece> pieceArray = GameParser.genChessPieceArrayList(pieceJsonArray);
+        ArrayList<ChessPiece> pieceArray = GameParser.genChessPieceArrayList(testBoard, pieceJsonArray);
         assertEquals(2, pieceArray.size());
     }
 

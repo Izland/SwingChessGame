@@ -6,8 +6,8 @@ public class Bishop extends ChessPiece {
     // REQUIRES: pieceID should contain a single digit as a suffix, currentPosition should be a valid board square,
     // colour should be either "white" or "black"
     // EFFECTS: Constructs a bishop chess piece
-    public Bishop(String pieceID, String currentPosition, String colour) {
-        super("bishop", pieceID, currentPosition, colour);
+    public Bishop(Board board, String pieceID, String currentPosition, String colour) {
+        super(board, "bishop", pieceID, currentPosition, colour);
     }
 
     @Override

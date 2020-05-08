@@ -13,6 +13,7 @@ public class Game {
         this.players = new ArrayList<>();
         this.board = new Board();
         initializePlayers();
+        board.initPieces();
     }
 
     public Game(ArrayList<Player> players, Board board) {

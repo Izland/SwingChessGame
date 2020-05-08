@@ -6,8 +6,8 @@ public class Queen extends ChessPiece {
     // REQUIRES: pieceID should contain a single digit as a suffix, currentPosition should be a valid board square,
     // colour should be either "white" or "black"
     // EFFECTS: Constructs a queen chesspiece
-    public Queen(String currentPosition, String colour) {
-        super("queen", "queen1", currentPosition, colour);
+    public Queen(Board board, String currentPosition, String colour) {
+        super(board, "queen", "queen1", currentPosition, colour);
     }
 
     @Override

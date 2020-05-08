@@ -13,23 +13,22 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BoardTest {
 
     Board testBoard;
-    Board testBoard2;
     ArrayList<ChessPiece> pieces;
 
     @BeforeEach
     public void setup() {
-        pieces = createTestChessPieces();
         testBoard = new Board();
-        testBoard2 = new Board(pieces);
+        testBoard.initPieces();
+        pieces = createTestChessPieces();
     }
 
     private ArrayList<ChessPiece> createTestChessPieces() {
         ArrayList<ChessPiece> pieces = new ArrayList<>();
 
-        pieces.add(new Bishop("bishop1", "C1", "white"));
-        pieces.add(new Rook("rook1", "A1", "white"));
-        pieces.add(new Queen( "D8", "black"));
-        pieces.add(new Pawn("pawn7", "G7", "black"));
+        pieces.add(new Bishop(testBoard,"bishop1", "C1", "white"));
+        pieces.add(new Rook(testBoard, "rook1", "A1", "white"));
+        pieces.add(new Queen( testBoard, "D8", "black"));
+        pieces.add(new Pawn(testBoard, "pawn7", "G7", "black"));
 
         return pieces;
     }
@@ -44,10 +43,9 @@ public class BoardTest {
     }
 
     @Test
-    public void testConstructorNoParameter() {
+    public void testInitializePieces() {
         ArrayList<Tile> tileArrayList = testBoard.getBoardTiles();
         Map<String, Tile> boardTileMap = testBoard.getBoardTileMap();
-        assertEquals(64, tileArrayList.size());
 
         // Check that tiles are arranged properly with index of 0 meaning A1, 1 meaning A2, and so forth
         assertEquals("A1", tileArrayList.get(0).getBoardCoordinate());
@@ -72,28 +70,17 @@ public class BoardTest {
         assertEquals("pawn", testPiece.getPieceType());
         assertEquals("black", testPiece.getColour());
 
-        assertNull(testBoard.getSrcTile());
-        assertNull(testBoard.getTargetTile());
     }
 
     @Test
-    public void testConstructorWithParameter() {
-        ArrayList<Tile> tileArrayList = testBoard2.getBoardTiles();
-        Map<String, Tile> boardTileMap = testBoard2.getBoardTileMap();
+    public void testConstructor() {
+        ArrayList<Tile> tileArrayList = testBoard.getBoardTiles();
+        Map<String, Tile> boardTileMap = testBoard.getBoardTileMap();
+
+        assertEquals(64, boardTileMap.size());
         assertEquals(64, tileArrayList.size());
-
-        // Test occupied spaces
-        assertTrue(boardTileMap.get("A1").isOccupied());
-        assertTrue(boardTileMap.get("C1").isOccupied());
-        assertTrue(boardTileMap.get("D8").isOccupied());
-        assertTrue(boardTileMap.get("G7").isOccupied());
-
-        // Test spaces that should not be occupied with the current constructor argument
-        assertFalse(boardTileMap.get("B1").isOccupied());
-        assertFalse(boardTileMap.get("E8").isOccupied());
-
-        assertNull(testBoard2.getSrcTile());
-        assertNull(testBoard2.getTargetTile());
+        assertNull(testBoard.getSrcTile());
+        assertNull(testBoard.getTargetTile());
     }
 
     @Test
@@ -204,9 +191,9 @@ public class BoardTest {
     }
 
     @Test
-    public void testAssignPieceToTile() {
-        ChessPiece cp = new Pawn("pawn1", "C7", "black");
-        testBoard.assignPieceToTile(cp, "C6");
+    public void testassignPiece() {
+        ChessPiece cp = new Pawn(testBoard,"pawn1", "C7", "black");
+        testBoard.assignPiece(cp, "C6");
         assertEquals(cp, testBoard.getTile("C6").getOccupyingPiece());
     }
 
@@ -233,17 +220,17 @@ public class BoardTest {
     @Test
     public void testLoadPieces() {
         ArrayList<ChessPiece> testPieces = new ArrayList<>();
-        testPieces.add(new Rook("rook3", "A4", "white"));
-        testPieces.add(new Bishop("bishop3", "C4", "black"));
-        testPieces.add(new Pawn("pawn9", "E5", "white"));
-        testPieces.add(new Pawn("pawn10", "G6", "black"));
+        testPieces.add(new Rook(testBoard,"rook3", "A4", "white"));
+        testPieces.add(new Bishop(testBoard,"bishop3", "C4", "black"));
+        testPieces.add(new Pawn(testBoard,"pawn9", "E5", "white"));
+        testPieces.add(new Pawn(testBoard, "pawn10", "G6", "black"));
 
-        testBoard2.loadPieces(testPieces);
+        testBoard.loadPieces(testPieces);
 
-        assertTrue(testBoard2.getTile("A4").isOccupied());
-        assertTrue(testBoard2.getTile("C4").isOccupied());
-        assertTrue(testBoard2.getTile("E5").isOccupied());
-        assertTrue(testBoard2.getTile("G6").isOccupied());
+        assertTrue(testBoard.getTile("A4").isOccupied());
+        assertTrue(testBoard.getTile("C4").isOccupied());
+        assertTrue(testBoard.getTile("E5").isOccupied());
+        assertTrue(testBoard.getTile("G6").isOccupied());
     }
 
     @Test
@@ -274,6 +261,28 @@ public class BoardTest {
     public void testMoveInvalidTargetOccupiedByTeam() {
         Player testPlayer = new Player("black");
         assertFalse(testBoard.isMoveValid(testPlayer, "F8", "G7"));
+    }
+
+    @Test
+    public void testUpdateAllPieces() {
+        Tile srcTile = testBoard.getTile("D2");
+        Tile targetTile = testBoard.getTile("D3");
+
+        ChessPiece testBishop = testBoard.getTile("C1").getOccupyingPiece();
+        assertFalse(testBishop.getAvailableMoves().contains("D2"));
+        assertFalse(testBishop.getAvailableMoves().contains("E3"));
+
+        ChessPiece testPiece = srcTile.getOccupyingPiece();
+        testPiece.currentPosition = "D3";
+        srcTile.setOccupyingPiece(null);
+        targetTile.setOccupyingPiece(testPiece);
+        testBoard.updateAllPieceMoves();
+
+        assertTrue(testBishop.getAvailableMoves().contains("D2"));
+        assertTrue(testBishop.getAvailableMoves().contains("E3"));
+
+
+
     }
 }
 

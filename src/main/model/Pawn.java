@@ -7,8 +7,8 @@ public class Pawn extends ChessPiece {
     // currentPosition should be a valid unoccupied board square,
     // colour should be either "white" or "black"
     // EFFECTS: Constructs a pawn chess piece
-    public Pawn(String pieceID, String currentPosition, String colour) {
-        super("pawn", pieceID, currentPosition, colour);
+    public Pawn(Board board, String pieceID, String currentPosition, String colour) {
+        super(board, "pawn", pieceID, currentPosition, colour);
     }
 
     @Override

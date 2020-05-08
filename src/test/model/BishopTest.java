@@ -11,11 +11,13 @@ import static org.junit.jupiter.api.Assertions.*;
 // Tests for Bishop Class
 class BishopTest {
 
+    Board testBoard;
     Bishop testBishop;
 
     @BeforeEach
     public void setup() {
-        testBishop = new Bishop("bishop1", "E3", "white");
+        testBoard = new Board();
+        testBishop = new Bishop(testBoard, "bishop1", "E3", "white");
     }
 
     @Test

@@ -11,11 +11,13 @@ import static org.junit.jupiter.api.Assertions.*;
 // Tests for Queen Class
 class QueenTest {
 
+    Board testBoard;
     Queen testQueen;
 
     @BeforeEach
     public void setup() {
-        testQueen = new Queen( "D4", "white");
+        testBoard = new Board();
+        testQueen = new Queen(testBoard, "D4", "white");
     }
 
     @Test

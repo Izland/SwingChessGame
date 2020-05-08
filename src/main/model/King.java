@@ -6,8 +6,8 @@ public class King extends ChessPiece {
     // REQUIRES: pieceID should contain a single digit as a suffix, currentPosition should be a valid board square,
     // colour should be either "white" or "black"
     // EFFECTS: Constructs a king chess piece
-    public King(String currentPosition, String colour) {
-        super("king", "king1", currentPosition, colour);
+    public King(Board board, String currentPosition, String colour) {
+        super(board, "king", "king1", currentPosition, colour);
     }
 
     @Override

@@ -6,8 +6,8 @@ public class Rook extends ChessPiece {
     // REQUIRES: pieceID should contain a single digit as a suffix, currentPosition should be a valid board square,
     // colour should be either "white" or "black"
     // EFFECTS: Creates a rook chesspiece
-    public Rook(String pieceID, String currentPosition, String colour) {
-        super("rook", pieceID, currentPosition, colour);
+    public Rook(Board board, String pieceID, String currentPosition, String colour) {
+        super(board,"rook", pieceID, currentPosition, colour);
     }
 
     @Override

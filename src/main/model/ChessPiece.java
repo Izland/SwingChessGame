@@ -6,18 +6,20 @@ import java.util.HashSet;
 // Represents all of the chess pieces in the game that a player can utilize and move
 public abstract class ChessPiece {
 
+    protected final int minColumnValue = 65; // Hashcode of A
+    protected final int maxColumnValue = 72; // Hashcode of H
+    protected final int minRowValue = 49; // Hashcode of 1
+    protected final int maxRowValue = 56; // Hashcode of 8
     protected String pieceID;
     protected String pieceType;
     protected String currentPosition;
     protected String colour;
     protected HashSet<String> availableMoves;
-    protected final int minColumnValue = 65; // Hashcode of A
-    protected final int maxColumnValue = 72; // Hashcode of H
-    protected final int minRowValue = 49; // Hashcode of 1
-    protected final int maxRowValue = 56; // Hashcode of 8
+    protected Board board;
 
     // EFFECTS: Creates a chesspiece and initializes the piece's starting moves
-    public ChessPiece(String pieceType, String pieceID,  String currentPosition, String colour) {
+    public ChessPiece(Board board, String pieceType, String pieceID, String currentPosition, String colour) {
+        this.board = board;
         this.pieceType = pieceType;
         this.pieceID = pieceID;
         this.currentPosition = currentPosition;
@@ -46,30 +48,44 @@ public abstract class ChessPiece {
         return availableMoves;
     }
 
+    public void setBoard(Board b) {
+        board = b;
+    }
+
     // EFFECTS: If numPositions = 0, return all possible moves in a single direction, otherwise return only the
     // specified number of positions in that direction
     public HashSet<String> genDirectionalPositions(int columnTranslation, int rowTranslation, int numPositions) {
         HashSet<String> positionsToReturn = new HashSet<>();
         int totalColumnTranslation = columnTranslation;
         int totalRowTranslation = rowTranslation;
+        String translatedPosition = translatePosition(totalColumnTranslation, totalRowTranslation);
 
         if (numPositions == 0) {
-            while (translatePosition(totalColumnTranslation, totalRowTranslation) != null) {
+            while (translatedPosition != null && canGenerateMoreMoves(translatedPosition)) {
                 positionsToReturn.add(translatePosition(totalColumnTranslation, totalRowTranslation));
                 totalColumnTranslation += columnTranslation;
                 totalRowTranslation += rowTranslation;
+                translatedPosition = translatePosition(totalColumnTranslation, totalRowTranslation);
             }
         } else {
             for (int i = 0; i < numPositions; i++) {
-                String translatedPosition = translatePosition(totalColumnTranslation, totalRowTranslation);
+                translatedPosition = translatePosition(totalColumnTranslation, totalRowTranslation);
                 if (translatedPosition != null) {
-                    positionsToReturn.add(translatedPosition);
+                    if (canGenerateMoreMoves(translatedPosition)) {
+                        positionsToReturn.add(translatedPosition);
+                        totalColumnTranslation += columnTranslation;
+                        totalRowTranslation += rowTranslation;
+                    } else {
+                        break;
+                    }
+                } else {
+                    break;
                 }
-                totalColumnTranslation += columnTranslation;
-                totalRowTranslation += rowTranslation;
             }
         }
-
+        if (checkForCaptureMove(translatedPosition)) {
+            positionsToReturn.add(translatedPosition);
+        }
         return positionsToReturn;
     }
 
@@ -100,11 +116,26 @@ public abstract class ChessPiece {
 
     // EFFECTS: Returns true if hashCodes are within given min and max values, false otherwise
     public boolean isPositionValid(int columnHashCode, int rowHashCode) {
-        
+
         if (columnHashCode < minColumnValue || columnHashCode > maxColumnValue) {
             return false;
         }
         return rowHashCode >= minRowValue && rowHashCode <= maxRowValue;
+    }
+
+    public boolean canGenerateMoreMoves(String targetBoardSquare) {
+        return !board.getTile(targetBoardSquare).isOccupied();
+    }
+
+    public boolean checkForCaptureMove(String targetBoardSquare) {
+        if (targetBoardSquare == null) {
+            return false;
+        }
+        ChessPiece cp = board.getTile(targetBoardSquare).getOccupyingPiece();
+        if (cp == null) {
+            return false;
+        }
+        return !cp.getColour().equals(colour);
     }
 
     public abstract void updateAvailableMoves();

@@ -1,5 +1,6 @@
 package model;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +10,7 @@ public class Board {
 
     private Map<String, Tile> boardTileMap;
     private ArrayList<Tile> boardTiles;
+    private ArrayList<ChessPiece> pieces;
     private Tile srcTile;
     private Tile targetTile;
 
@@ -16,17 +18,18 @@ public class Board {
     public Board() {
         boardTileMap = new HashMap<>();
         boardTiles = new ArrayList<>();
+        pieces = new ArrayList<>();
         initTiles();
-        initPieces();
     }
 
-    // EFFECTS: Constructs a Board object
-    public Board(ArrayList<ChessPiece> pieces) {
-        boardTileMap = new HashMap<>();
-        boardTiles = new ArrayList<>();
-        initTiles();
-        loadPieces(pieces);
-    }
+//    // EFFECTS: Constructs a Board object
+//    public Board(ArrayList<ChessPiece> pieces) {
+//        boardTileMap = new HashMap<>();
+//        boardTiles = new ArrayList<>();
+//        pieces = new ArrayList<>();
+//        initTiles();
+//        loadPieces(pieces);
+//    }
 
     public Tile getTile(String boardCoordinate) {
         return boardTileMap.get(boardCoordinate);
@@ -96,8 +99,8 @@ public class Board {
         for (int i = 1; i < 9; i++) {
             // Source: https://unicode-table.com/en/#0031
             String pawnCoord = (char) (i + 64) + rowID;
-            Pawn p = new Pawn("pawn" + i, pawnCoord, teamColour);
-            assignPieceToTile(p, pawnCoord);
+            Pawn p = new Pawn(this,"pawn" + i, pawnCoord, teamColour);
+            assignPiece(p, pawnCoord);
         }
     }
 
@@ -111,21 +114,22 @@ public class Board {
         } else {
             rowID = "8";
         }
-        assignPieceToTile(new Rook("rook1", "A" + rowID, teamColour), "A" + rowID);
-        assignPieceToTile(new Rook("rook2", "H" + rowID, teamColour), "H" + rowID);
-        assignPieceToTile(new Knight("knight1", "B" + rowID, teamColour), "B" + rowID);
-        assignPieceToTile(new Knight("knight2", "G" + rowID, teamColour), "G" + rowID);
-        assignPieceToTile(new Bishop("bishop1", "C" + rowID, teamColour), "C" + rowID);
-        assignPieceToTile(new Bishop("bishop2", "F" + rowID, teamColour), "F" + rowID);
-        assignPieceToTile(new Queen("D" + rowID, teamColour), "D" + rowID);
-        assignPieceToTile(new King("E" + rowID, teamColour), "E" + rowID);
+        assignPiece(new Rook(this, "rook1", "A" + rowID, teamColour), "A" + rowID);
+        assignPiece(new Rook(this, "rook2", "H" + rowID, teamColour), "H" + rowID);
+        assignPiece(new Knight(this,"knight1", "B" + rowID, teamColour), "B" + rowID);
+        assignPiece(new Knight(this, "knight2", "G" + rowID, teamColour), "G" + rowID);
+        assignPiece(new Bishop(this,"bishop1", "C" + rowID, teamColour), "C" + rowID);
+        assignPiece(new Bishop(this,"bishop2", "F" + rowID, teamColour), "F" + rowID);
+        assignPiece(new Queen(this,"D" + rowID, teamColour), "D" + rowID);
+        assignPiece(new King(this,"E" + rowID, teamColour), "E" + rowID);
     }
 
     // MODIFIES: Tile t
     // EFFECTS:
-    public void assignPieceToTile(ChessPiece piece, String tileCoordinate) {
+    public void assignPiece(ChessPiece piece, String tileCoordinate) {
         Tile t = getTile(tileCoordinate);
         t.setOccupyingPiece(piece);
+        pieces.add(piece);
     }
 
     public boolean movePiece(Player p, String srcCoordinate, String targetCoordinate) {
@@ -136,17 +140,30 @@ public class Board {
             srcTile.setOccupyingPiece(null);
             targetTile.setOccupyingPiece(cp);
             cp.updateLocation(targetCoordinate);
-            cp.updateAvailableMoves();
+            updateAllPieceMoves();
             return true;
         }
         return false;
     }
 
+    // MODIFIES: this
+    // EFFECTS: Updates every piece's available moves
+    public void updateAllPieceMoves() {
+        for (ChessPiece p : pieces) {
+            p.updateAvailableMoves();
+        }
+    }
+
     // REQUIRES: All ChessPiece objects should have unique currentPositions
-    // EFFECTS: Assigns each piece in the list to the tile with the same coordinate as the Chesspiece
-    public void loadPieces(ArrayList<ChessPiece> pieces) {
-        for (ChessPiece cp : pieces) {
-            assignPieceToTile(cp, cp.getCurrentPosition());
+    // MODIFIES: this
+    // EFFECTS: Assigns each piece in the list to the tile with the same coordinate as the Chesspiece after clearing the board
+    public void loadPieces(ArrayList<ChessPiece> piecesToLoad) {
+        pieces.clear();
+        for (Tile t : boardTiles) {
+            t.setOccupyingPiece(null);
+        }
+        for (ChessPiece cp : piecesToLoad) {
+            assignPiece(cp, cp.getCurrentPosition());
         }
     }
 

@@ -6,8 +6,8 @@ public class Knight extends ChessPiece {
     // REQUIRES: pieceID should contain a single digit as a suffix, currentPosition should be a valid board square,
     // colour should be either "white" or "black"
     // EFFECTS: Constructs a knight chess piece
-    public Knight(String pieceID, String currentPosition, String colour) {
-        super("knight", pieceID, currentPosition, colour);
+    public Knight(Board board, String pieceID, String currentPosition, String colour) {
+        super(board, "knight", pieceID, currentPosition, colour);
     }
 
     @Override

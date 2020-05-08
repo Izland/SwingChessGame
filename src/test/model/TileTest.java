@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 // Tests for Tile class
 public class TileTest {
 
+    Board testBoard;
     Tile testTile;
     Tile testTile2;
     ChessPiece testBlackPiece;
@@ -16,10 +17,11 @@ public class TileTest {
 
     @BeforeEach
     public void setup() {
+        testBoard = new Board();
         testTile = new Tile("D7");
         testTile2 = new Tile("E8");
-        testBlackPiece = new Pawn("pawn1", "D7", "black");
-        testWhitePiece = new Knight("knight1", "E8", "white");
+        testBlackPiece = new Pawn(testBoard,"pawn1", "D7", "black");
+        testWhitePiece = new Knight(testBoard,"knight1", "E8", "white");
         testPlayer = new Player("black");
     }
 

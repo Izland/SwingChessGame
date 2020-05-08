@@ -20,12 +20,13 @@ public class GameParser {
         // https://howtodoinjava.com/library/json-simple-read-write-json-examples/#write-json-file
         JSONParser jsonParser = new JSONParser();
         try (FileReader reader = new FileReader(fileLocation)) {
+            Board board = new Board();
             JSONObject saveDataObject = (JSONObject) jsonParser.parse(reader);
             JSONArray jsonPieces = (JSONArray) saveDataObject.get("pieces");
             JSONArray jsonPlayers = (JSONArray) saveDataObject.get("players");
             ArrayList<Player> players = generatePlayerArrayList(jsonPlayers);
-            ArrayList<ChessPiece> pieces = genChessPieceArrayList(jsonPieces);
-            Board board = new Board(pieces);
+            ArrayList<ChessPiece> pieces = genChessPieceArrayList(board, jsonPieces);
+            board.loadPieces(pieces);
             return new Game(players, board);
         } catch (IOException | ParseException e) {
             System.out.println(e);
@@ -52,7 +53,7 @@ public class GameParser {
 
     // REQUIRES: pieces must contain JSONObjects with fields "location", "teamColour", "type", and "ID"
     // EFFECTS: Parses JSONArray and creates a new ChessPiece for each object within it
-    public static ArrayList<ChessPiece> genChessPieceArrayList(JSONArray pieces) {
+    public static ArrayList<ChessPiece> genChessPieceArrayList(Board board, JSONArray pieces) {
         ArrayList<ChessPiece> arrayToReturn = new ArrayList<>();
 
         for (Object o : pieces) {
@@ -62,7 +63,7 @@ public class GameParser {
             String pieceType = (String) pieceObject.get("type");
             String pieceID = (String) pieceObject.get("ID");
 
-            ChessPiece cp = genPiece(pieceType, pieceID, location, teamColour);
+            ChessPiece cp = genPiece(board, pieceType, pieceID, location, teamColour);
             arrayToReturn.add(cp);
         }
         return arrayToReturn;
@@ -70,23 +71,15 @@ public class GameParser {
 
     // REQUIRES: teamColour to be set to "white" or "black"; currentPosition should be unoccupied
     // EFFECTS: Adds a newly created chess piece to the Player's pieces, based on loaded JSON data
-    public static ChessPiece genPiece(String pieceType, String pieceID, String currentPosition, String teamColour) {
+    public static ChessPiece genPiece(Board board, String pieceType, String pieceID, String currentPosition, String teamColour) {
         // https://stackoverflow.com/questions/7438612/how-to-remove-the-last-character-from-a-string
-//        String type = pieceID.substring(0, pieceID.length() - 1);
-        ChessPiece cp;
-        if (pieceType.equals("pawn")) {
-            cp = new Pawn(pieceID, currentPosition, teamColour);
-        } else if (pieceType.equals("rook")) {
-            cp = new Rook(pieceID, currentPosition, teamColour);
-        } else if (pieceType.equals("bishop")) {
-            cp = new Bishop(pieceID, currentPosition, teamColour);
-        } else if (pieceType.equals("knight")) {
-            cp = new Knight(pieceID, currentPosition, teamColour);
-        } else if (pieceType.equals("king")) {
-            cp = new King(currentPosition, teamColour);
-        } else {
-            cp = new Queen(currentPosition, teamColour);
-        }
-        return cp;
+        return switch (pieceType) {
+            case "pawn" -> new Pawn(board, pieceID, currentPosition, teamColour);
+            case "rook" -> new Rook(board, pieceID, currentPosition, teamColour);
+            case "bishop" -> new Bishop(board, pieceID, currentPosition, teamColour);
+            case "knight" -> new Knight(board, pieceID, currentPosition, teamColour);
+            case "king" -> new King(board, currentPosition, teamColour);
+            default -> new Queen(board, currentPosition, teamColour);
+        };
     }
 }

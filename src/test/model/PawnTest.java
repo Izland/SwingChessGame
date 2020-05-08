@@ -11,13 +11,15 @@ import static org.junit.jupiter.api.Assertions.*;
 // Tests for Pawn Class
 class PawnTest {
 
+    Board testBoard;
     Pawn testPawn;
     Pawn testPawn2;
 
     @BeforeEach
     public void setup() {
-        testPawn = new Pawn("pawn1", "G2", "white");
-        testPawn2 = new Pawn("pawn2", "G7", "black");
+        testBoard = new Board();
+        testPawn = new Pawn(testBoard,"pawn1", "G2", "white");
+        testPawn2 = new Pawn(testBoard, "pawn2", "G7", "black");
     }
 
     @Test

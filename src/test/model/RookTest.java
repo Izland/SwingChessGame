@@ -10,12 +10,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 // Tests for Rook Class
 class RookTest {
-
+    Board testBoard;
     Rook testRook;
 
     @BeforeEach
     public void setup() {
-        testRook = new Rook("rook1", "C6", "white");
+        testBoard = new Board();
+        testRook = new Rook(testBoard, "rook1", "C6", "white");
     }
 
     @Test

@@ -11,11 +11,13 @@ import static org.junit.jupiter.api.Assertions.*;
 // Tests for Knight Class
 class KnightTest {
 
+    Board testBoard;
     Knight testKnight;
 
     @BeforeEach
     public void setup() {
-        testKnight = new Knight("knight1", "D6", "white");
+        testBoard = new Board();
+        testKnight = new Knight(testBoard,"knight1", "D6", "white");
     }
 
     @Test

@@ -11,7 +11,7 @@ import java.awt.*;
 import java.util.ArrayList;
 
 // The main game UI class
-public class GameFrame extends JFrame {
+public class  GameFrame extends JFrame {
 
     private Game game;
     private BoardPanel boardPanel;
