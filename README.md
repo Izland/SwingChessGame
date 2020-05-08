@@ -8,8 +8,6 @@ use this application**, and hopefully have fun doing it.
 
 Things being worked on:
 
--The ability to create a new game or load a game after a game has already started
-
 -Checking for a check/checkmate
 
 -Add a computer AI to play against
