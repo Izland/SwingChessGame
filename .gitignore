@@ -1,3 +1,5 @@
 # Default ignored files
 .idea/**/workspace.xml
 .idea/dictionaries/
+/out
+/data/savedata.json
