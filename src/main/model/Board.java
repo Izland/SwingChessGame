@@ -43,6 +43,10 @@ public class Board {
         return targetTile;
     }
 
+    public ArrayList<ChessPiece> getPieces() {
+        return pieces;
+    }
+
     public Map<String, Tile> getBoardTileMap() {
         return boardTileMap;
     }

@@ -190,6 +190,12 @@ public class  GameFrame extends JFrame {
         }
     }
 
+    public void update() {
+        boardPanel.updatePanelsAfterMove();
+        gameInfoPanel.updateActivePlayer();
+        game.checkForCheck();
+    }
+
     public static void main(String[] args) {
         new GameFrame();
     }

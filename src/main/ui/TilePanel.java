@@ -40,16 +40,16 @@ public class TilePanel extends JPanel {
 
     // MODIFIES: this
     // EFFECTS: Removes any ChessPiece image and reloads a new one if a piece is occupying the object's tile
-    public void refreshTileImage(TilePanel tilePanel) {
-        for (Component c : tilePanel.getComponents()) {
+    public void refreshTileImage() {
+        for (Component c : this.getComponents()) {
             if (c instanceof JLabel) {
-                tilePanel.remove(c);
-                tilePanel.revalidate();
-                tilePanel.repaint();
+                this.remove(c);
+                this.revalidate();
+                this.repaint();
 
             }
         }
-        tilePanel.loadPieceIcon();
+        this.loadPieceIcon();
     }
 
     private void addLogicToMouseClicked() {
@@ -71,12 +71,14 @@ public class TilePanel extends JPanel {
                 // https://stackoverflow.com/questions/7117332/dynamically-remove-component-from-jpanel
                 // https://stackoverflow.com/questions/13859348/how-to-hide-or-remove-a-jlabel
                 new MP3Player(new File("data/piece-sound-effect-2.mp3")).play();
-                updatePanelsAfterMove(boardPanel.getSrcTilePanel(), this);
-                gameFrame.getGameInfoPanel().updateActivePlayer();
+                gameFrame.update();
+            } else {
+                board.resetMoveProperties();
+                boardPanel.getSrcTilePanel().setBorder(null);
+                boardPanel.setSrcTilePanel(null);
+                boardPanel.setTargetTilePanel(null);
+
             }
-        } else if (srcTile != null) {
-            boardPanel.getSrcTilePanel().setBorder(null);
-            board.resetMoveProperties();
         }
     }
 
@@ -110,13 +112,7 @@ public class TilePanel extends JPanel {
         });
     }
 
-    // MODIFIES: srcPanel
-    // EFFECTS: Removes the red border from the srcPanel when called and updates the images on both panels
-    private void updatePanelsAfterMove(TilePanel srcPanel, TilePanel targetTilePanel) {
-        srcPanel.setBorder(null);
-        refreshTileImage(srcPanel);
-        refreshTileImage(targetTilePanel);
-    }
+
 
 
     // MODIFIES: this

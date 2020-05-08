@@ -65,6 +65,14 @@ public class BoardPanel extends JPanel {
         this.targetTilePanel = targetTilePanel;
     }
 
+    // MODIFIES: srcPanel
+    // EFFECTS: Removes the red border from the srcPanel when called and updates the images on both panels
+    public void updatePanelsAfterMove() {
+        srcTilePanel.setBorder(null);
+        srcTilePanel.refreshTileImage();
+        targetTilePanel.refreshTileImage();
+    }
+
     // MODIFIES: tileIdArray
     // EFFECTS: Adds 8 consecutive numbers to tileIdArray starting from startIndex
     private void initTileIdRow(ArrayList<Integer> tileIdArray, int startIndex) {

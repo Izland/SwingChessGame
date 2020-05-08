@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 // Represents the game itself
 public class Game {
@@ -8,6 +9,8 @@ public class Game {
     private ArrayList<Player> players;
     private Board board;
     private Player activePlayer;
+    private boolean inCheck;
+    private King kingInCheck;
 
     public Game() {
         this.players = new ArrayList<>();
@@ -33,8 +36,25 @@ public class Game {
         return players;
     }
 
+    private ArrayList<King> getKings() {
+        ArrayList<ChessPiece> pieces = board.getPieces();
+        ArrayList<King> kings = new ArrayList<>();
+
+        for (ChessPiece cp : pieces) {
+            if (cp.getPieceType().equals("king")) {
+                King kingPiece = (King) cp;
+                kings.add(kingPiece);
+            }
+        }
+        return kings;
+    }
+
     public void setBoard(Board board) {
         this.board = board;
+    }
+
+    public void setInCheck(boolean inCheck) {
+        this.inCheck = inCheck;
     }
 
     // EFFECTS: Creates 2 players and adds them to game
@@ -51,6 +71,32 @@ public class Game {
                 activePlayer = p;
             }
         }
+    }
+
+
+    // EFFECTS: Returns true if either king is in check, false otherwise
+    public void checkForCheck() {
+        ArrayList<ChessPiece> pieces = board.getPieces();
+        ArrayList<King> kings = getKings();
+
+        for (ChessPiece cp : pieces) {
+            HashSet<String> availableMoves = cp.getAvailableMoves();
+            King king1 = kings.get(0);
+            King king2 = kings.get(1);
+            for (String move : availableMoves) {
+                if (move.equals(king1.getCurrentPosition())) {
+                    setInCheck(true);
+                    kingInCheck = king1;
+                    return;
+                } else if (move.equals(king2.getCurrentPosition())) {
+                    setInCheck(true);
+                    kingInCheck = king2;
+                    return;
+                }
+            }
+        }
+        setInCheck(false);
+        kingInCheck = null;
     }
 
     // EFFECTS: Selects piece based on user input and moves it to their target position if valid, then
