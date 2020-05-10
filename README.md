@@ -8,7 +8,9 @@ use this application**, and hopefully have fun doing it.
 
 Things being worked on:
 
--Checking for a check/checkmate
+-assignPiece() might be able to just use the piece's current location instead of another parameter
+
+-Change variables to have local unique names instead of similar global variable names
 
 -Add a computer AI to play against
 
