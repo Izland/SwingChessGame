@@ -38,6 +38,10 @@ public class TilePanel extends JPanel {
         loadMouseListener();
     }
 
+    public Tile getTile() {
+        return tile;
+    }
+
     // MODIFIES: this
     // EFFECTS: Removes any ChessPiece image and reloads a new one if a piece is occupying the object's tile
     public void refreshTileImage() {
@@ -53,31 +57,34 @@ public class TilePanel extends JPanel {
     }
 
     private void addLogicToMouseClicked() {
-        Player activePlayer = game.getActivePlayer();
-        Board board = game.getBoard();
-        Tile srcTile = board.getSrcTile();
 
-        if (tile.isOccupiedByTeam(activePlayer)) {
-            if (srcTile != null) {
-                boardPanel.getSrcTilePanel().setBorder(null);
-            }
-            board.setSrcTile(tile);
-            boardPanel.setSrcTilePanel(this);
-            this.setBorder(tileBorder);
-        } else if (srcTile != null && !tile.isOccupiedByTeam(activePlayer)) {
-            board.setTargetTile(tile);
-            boardPanel.setTargetTilePanel(this);
-            if (game.makeMove()) {
-                // https://stackoverflow.com/questions/7117332/dynamically-remove-component-from-jpanel
-                // https://stackoverflow.com/questions/13859348/how-to-hide-or-remove-a-jlabel
-                new MP3Player(new File("data/piece-sound-effect-2.mp3")).play();
-                gameFrame.update();
-            } else {
-                board.resetMoveProperties();
-                boardPanel.getSrcTilePanel().setBorder(null);
-                boardPanel.setSrcTilePanel(null);
-                boardPanel.setTargetTilePanel(null);
+        if (gameFrame.getIsActiveGame()) {
+            Player activePlayer = game.getActivePlayer();
+            Board board = game.getBoard();
+            Tile srcTile = board.getSrcTile();
 
+            if (tile.isOccupiedByTeam(activePlayer)) {
+                if (srcTile != null) {
+                    boardPanel.getSrcTilePanel().setBorder(null);
+                }
+                board.setSrcTile(tile);
+                boardPanel.setSrcTilePanel(this);
+                this.setBorder(tileBorder);
+            } else if (srcTile != null && !tile.isOccupiedByTeam(activePlayer)) {
+                board.setTargetTile(tile);
+                boardPanel.setTargetTilePanel(this);
+                if (game.makeMove()) {
+                    // https://stackoverflow.com/questions/7117332/dynamically-remove-component-from-jpanel
+                    // https://stackoverflow.com/questions/13859348/how-to-hide-or-remove-a-jlabel
+                    new MP3Player(new File("data/piece-sound-effect-2.mp3")).play();
+                    gameFrame.update();
+                } else {
+                    board.resetMoveProperties();
+                    boardPanel.getSrcTilePanel().setBorder(null);
+                    boardPanel.setSrcTilePanel(null);
+                    boardPanel.setTargetTilePanel(null);
+
+                }
             }
         }
     }

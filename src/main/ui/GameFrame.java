@@ -1,6 +1,7 @@
 package ui;
 
 
+import com.sun.jdi.JDIPermission;
 import model.Game;
 import model.Player;
 import persistence.GameParser;
@@ -8,6 +9,8 @@ import persistence.GameWriter;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 // The main game UI class
@@ -18,6 +21,7 @@ public class  GameFrame extends JFrame {
     private GameInfoPanel gameInfoPanel;
     private String firstPlayerName;
     private String secondPlayerName;
+    private boolean isActiveGame;
 
     // EFFECTS: Creates a GameFrame object
     public GameFrame() {
@@ -34,6 +38,7 @@ public class  GameFrame extends JFrame {
     // MODIFIES: this, Game
     // EFFECTS: Creates new game, set game players names and creates, configures, and places panels
     private void initGame() {
+        isActiveGame = true;
         game = new Game();
         game.getPlayers().get(0).setName(this.firstPlayerName);
         game.getPlayers().get(1).setName(this.secondPlayerName);
@@ -52,6 +57,7 @@ public class  GameFrame extends JFrame {
         if (game == null) {
             JOptionPane.showMessageDialog(this, "No game saved!");
         } else {
+            isActiveGame = true;
             loadPlayerNames(game.getPlayers());
             configurePanels(game);
             placePanels();
@@ -97,6 +103,10 @@ public class  GameFrame extends JFrame {
 
     public Game getGame() {
         return game;
+    }
+
+    public boolean getIsActiveGame() {
+        return isActiveGame;
     }
 
     // EFFECTS: Creates a dialog popup that lets the user choose how many human players there are
@@ -157,7 +167,7 @@ public class  GameFrame extends JFrame {
         JMenuItem saveGame = new JMenuItem("Save Game");
         JMenuItem exitGame = new JMenuItem("Exit Game");
 
-        loadActionListeners(createGame, loadGame, saveGame, exitGame);
+        loadMenuActionListeners(createGame, loadGame, saveGame, exitGame);
 
         fileMenu.add(createGame);
         fileMenu.add(loadGame);
@@ -168,12 +178,79 @@ public class  GameFrame extends JFrame {
         this.setJMenuBar(menuBar);
     }
 
+    private void createConversionDialog() {
+        JDialog conversionDialog = new JDialog(this, "Piece Conversion", true);
+        conversionDialog.setLayout(new GridBagLayout());
+        JPanel innerPanel = new JPanel();
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        JLabel instruction = new JLabel("Choose a piece to promote to:");
+        JButton queenButton = new JButton("Queen");
+        JButton bishopButton = new JButton("Bishop");
+        JButton knightButton = new JButton("Knight");
+        JButton rookButton = new JButton("Rook");
+
+        loadConversionButtonListeners(conversionDialog, queenButton, bishopButton, knightButton, rookButton);
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        conversionDialog.add(instruction, gbc);
+
+        innerPanel.add(queenButton);
+        innerPanel.add(bishopButton);
+        innerPanel.add(knightButton);
+        innerPanel.add(rookButton);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        conversionDialog.add(innerPanel, gbc);
+
+        conversionDialog.setSize(500,150);
+        conversionDialog.setVisible(true);
+    }
+
     // EFFECTS: Adds action listeners to all the menu items
-    private void loadActionListeners(JMenuItem createGame, JMenuItem loadGame, JMenuItem saveGame, JMenuItem exitGame) {
+    private void loadMenuActionListeners(JMenuItem createGame, JMenuItem loadGame, JMenuItem saveGame, JMenuItem exitGame) {
         createGame.addActionListener(e -> initPlayerDialog());
         loadGame.addActionListener(e -> loadGame());
         saveGame.addActionListener(e -> GameWriter.saveGame(game, "data/savedata.json"));
         exitGame.addActionListener(e -> System.exit(0));
+    }
+
+    // EFFECTS: Adds action listeners to all the menu items
+    private void loadConversionButtonListeners(JDialog dialog, JButton queenButton, JButton bishopButton, JButton knightButton, JButton rookButton) {
+        queenButton.addActionListener(e -> {
+            dialog.setVisible(false);
+            String tileLocation = game.getPawnToConvert().getCurrentPosition();
+            game.convertPawn("queen");
+            boardPanel.refreshTilePanel(tileLocation);
+            game.getBoard().updateAllPieceMoves();
+            game.checkForMovesToUncheck();
+        });
+        bishopButton.addActionListener(e -> {
+            dialog.setVisible(false);
+            String tileLocation = game.getPawnToConvert().getCurrentPosition();
+            game.convertPawn("bishop");
+            boardPanel.refreshTilePanel(tileLocation);
+            game.getBoard().updateAllPieceMoves();
+            game.checkForMovesToUncheck();
+        });
+        knightButton.addActionListener(e -> {
+            dialog.setVisible(false);
+            String tileLocation = game.getPawnToConvert().getCurrentPosition();
+            game.convertPawn("knight");
+            boardPanel.refreshTilePanel(tileLocation);
+            game.getBoard().updateAllPieceMoves();
+            game.checkForMovesToUncheck();
+        });
+        rookButton.addActionListener(e -> {
+            dialog.setVisible(false);
+            String tileLocation = game.getPawnToConvert().getCurrentPosition();
+            game.convertPawn("rook");
+            boardPanel.refreshTilePanel(tileLocation);
+            game.getBoard().updateAllPieceMoves();
+            game.checkForMovesToUncheck();
+        });
     }
 
     // REQUIRES: players should have 2 players
@@ -193,7 +270,21 @@ public class  GameFrame extends JFrame {
     public void update() {
         boardPanel.updatePanelsAfterMove();
         gameInfoPanel.updateActivePlayer();
-        game.checkForCheck();
+
+        if (game.canAPawnBeConverted()) {
+            createConversionDialog();
+
+        }
+        if (game.isInCheck()) {
+            game.checkForMovesToUncheck();
+            gameInfoPanel.addCheck();
+            if (game.checkForWinCondition()) {
+                isActiveGame = false;
+                gameInfoPanel.updateWinner();
+            }
+        } else {
+            gameInfoPanel.removeCheck();
+        }
     }
 
     public static void main(String[] args) {

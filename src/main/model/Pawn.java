@@ -16,14 +16,6 @@ public class Pawn extends ChessPiece {
     // EFFECTS: Adds all board positions that are in front of pawn to availableMoves
     public void updateAvailableMoves() {
         clearAvailableMoves();
-        if (colour.equals("white")) {
-            availableMoves.addAll(genDirectionalPositions(-1, 1, 1));
-            availableMoves.addAll(genDirectionalPositions(1, 1, 1));
-            availableMoves.addAll(genDirectionalPositions(0, 1, 2));
-        } else if (colour.equals("black")) {
-            availableMoves.addAll(genDirectionalPositions(-1, -1, 1));
-            availableMoves.addAll(genDirectionalPositions(1, -1, 1));
-            availableMoves.addAll(genDirectionalPositions(0, -1, 2));
-        }
+        generateMoveSetForPawn();
     }
 }

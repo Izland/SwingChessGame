@@ -79,7 +79,7 @@ public class GameParser {
             case "bishop" -> new Bishop(board, pieceID, currentPosition, teamColour);
             case "knight" -> new Knight(board, pieceID, currentPosition, teamColour);
             case "king" -> new King(board, currentPosition, teamColour);
-            default -> new Queen(board, currentPosition, teamColour);
+            default -> new Queen(board, pieceID, currentPosition, teamColour);
         };
     }
 }

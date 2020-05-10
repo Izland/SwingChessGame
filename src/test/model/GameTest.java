@@ -66,6 +66,255 @@ public class GameTest {
     }
 
     @Test
+    public void testMakeMoveInCheckKingAttack() {
+
+        // setup
+        Board testBoard = testGame.getBoard();
+
+        // Remove original king
+        ChessPiece ogKing = testBoard.getTile("E8").getOccupyingPiece();
+        testBoard.getTile("E8").setOccupyingPiece(null);
+        testBoard.getPieces().remove(ogKing);
+
+        // Create test pieces and assign them
+        King testKing = new King(testGame.getBoard(), "E5", "black");
+        Pawn testPawn = new Pawn(testGame.getBoard(), "pawn1", "D4", "white");
+        testBoard.assignPiece(testKing, "E5");
+        testBoard.assignPiece(testPawn, "D4");
+
+        // Put game in check
+        testGame.swapActivePlayer();
+        testGame.updateCheckState();
+        assertTrue(testGame.isInCheck());
+
+        // Make Move
+        Tile srcTile = testBoard.getTile("E5");
+        Tile targetTile = testBoard.getTile("D4");
+        testBoard.setSrcTile(srcTile);
+        testBoard.setTargetTile(targetTile);
+        assertTrue(testGame.makeMove());
+        assertEquals("D4", testKing.getCurrentPosition());
+
+        // Take game out of check
+        testGame.updateCheckState();
+        assertFalse(testGame.isInCheck());
+
+
+    }
+
+    @Test
+    public void testMakeMoveInCheckKingMove() {
+        // setup
+        Board testBoard = testGame.getBoard();
+
+        // Remove original king
+        ChessPiece ogKing = testBoard.getTile("E8").getOccupyingPiece();
+        testBoard.getTile("E8").setOccupyingPiece(null);
+        testBoard.getPieces().remove(ogKing);
+
+        // Create test pieces and assign them
+        King testKing = new King(testGame.getBoard(), "E5", "black");
+        Pawn testPawn = new Pawn(testGame.getBoard(), "pawn1", "D4", "white");
+        testBoard.assignPiece(testKing, "E5");
+        testBoard.assignPiece(testPawn, "D4");
+
+        // Put game in check
+        testGame.swapActivePlayer();
+        testGame.updateCheckState();
+        assertTrue(testGame.isInCheck());
+
+        // Make Move
+        Tile srcTile = testBoard.getTile("E5");
+        Tile targetTile = testBoard.getTile("F6");
+        testBoard.setSrcTile(srcTile);
+        testBoard.setTargetTile(targetTile);
+        assertTrue(testGame.makeMove());
+        assertEquals("F6", testKing.getCurrentPosition());
+
+        // Take game out of check
+        testGame.updateCheckState();
+        assertFalse(testGame.isInCheck());
+    }
+
+    @Test
+    public void testMakeMoveUnsuccessfulKingMove() {
+        // setup
+        Board testBoard = testGame.getBoard();
+
+        // Remove original king
+        ChessPiece ogKing = testBoard.getTile("E8").getOccupyingPiece();
+        testBoard.getTile("E8").setOccupyingPiece(null);
+        testBoard.getPieces().remove(ogKing);
+
+        // Create test pieces and assign them
+        King testKing = new King(testGame.getBoard(), "E5", "black");
+        Bishop testBishop = new Bishop(testGame.getBoard(), "bishop", "D4", "white");
+        testBoard.assignPiece(testKing, "E5");
+        testBoard.assignPiece(testBishop, "D4");
+
+        // Put game in check
+        testGame.swapActivePlayer();
+        testGame.updateCheckState();
+        assertTrue(testGame.isInCheck());
+
+        // Make Move
+        Tile srcTile = testBoard.getTile("E5");
+        Tile targetTile = testBoard.getTile("F6");
+        testBoard.setSrcTile(srcTile);
+        testBoard.setTargetTile(targetTile);
+        assertFalse(testGame.makeMove());
+        assertEquals("E5", testKing.getCurrentPosition());
+
+        // Game should still be in check
+        testGame.updateCheckState();
+        assertTrue(testGame.isInCheck());
+    }
+
+    @Test
+    public void testMakeMovePieceThatDoesNotBlockCheckPath() {
+        // setup
+        Board testBoard = testGame.getBoard();
+
+        // Remove original king
+        ChessPiece ogKing = testBoard.getTile("E8").getOccupyingPiece();
+        testBoard.getTile("E8").setOccupyingPiece(null);
+        testBoard.getPieces().remove(ogKing);
+
+        // Create test pieces and assign them
+        King testKing = new King(testGame.getBoard(), "E5", "black");
+        Bishop testBishop = new Bishop(testGame.getBoard(), "bishop", "D4", "white");
+        Pawn testPawn = (Pawn) testBoard.getTile("B7").getOccupyingPiece();
+        testBoard.assignPiece(testKing, "E5");
+        testBoard.assignPiece(testBishop, "D4");
+
+        // Put game in check
+        testGame.swapActivePlayer();
+        testGame.updateCheckState();
+        assertTrue(testGame.isInCheck());
+
+        // Make Move
+        Tile srcTile = testBoard.getTile("B7");
+        Tile targetTile = testBoard.getTile("B6");
+        testBoard.setSrcTile(srcTile);
+        testBoard.setTargetTile(targetTile);
+        assertFalse(testGame.makeMove());
+        assertEquals("B7", testPawn.getCurrentPosition());
+
+        // Game should still be in check
+        testGame.updateCheckState();
+        assertTrue(testGame.isInCheck());
+    }
+
+    @Test
+    public void testMakeMoveFriendlyPieceThatBlocksCheckPath() {
+        // setup
+        Board testBoard = testGame.getBoard();
+
+        // Remove original king
+        ChessPiece ogKing = testBoard.getTile("E8").getOccupyingPiece();
+        testBoard.getTile("E8").setOccupyingPiece(null);
+        testBoard.getPieces().remove(ogKing);
+
+        // Create test pieces and assign them
+        King testKing = new King(testGame.getBoard(), "F6", "black");
+        Bishop testBishop = new Bishop(testGame.getBoard(), "testbishop", "D4", "white");
+        Pawn testPawn = new Pawn(testGame.getBoard(), "testpawn", "E6", "black");
+        testBoard.assignPiece(testKing, "F6");
+        testBoard.assignPiece(testBishop, "D4");
+        testBoard.assignPiece(testPawn, "E6");
+
+        // Put game in check
+        testGame.swapActivePlayer();
+        testGame.updateCheckState();
+        assertTrue(testGame.isInCheck());
+
+        // Make Move
+        Tile srcTile = testBoard.getTile("E6");
+        Tile targetTile = testBoard.getTile("E5");
+        testBoard.setSrcTile(srcTile);
+        testBoard.setTargetTile(targetTile);
+        assertTrue(testGame.makeMove());
+        assertEquals("E5", testPawn.getCurrentPosition());
+
+        // Game should no longer be in check
+        testGame.updateCheckState();
+        assertFalse(testGame.isInCheck());
+    }
+
+    @Test
+    public void testMakeMovePieceThatBlocksCheckPath() {
+        // setup
+        Board testBoard = testGame.getBoard();
+
+        // Remove original king
+        ChessPiece ogKing = testBoard.getTile("E8").getOccupyingPiece();
+        testBoard.getTile("E8").setOccupyingPiece(null);
+        testBoard.getPieces().remove(ogKing);
+
+        // Create test pieces and assign them
+        King testKing = new King(testGame.getBoard(), "F6", "black");
+        Bishop testBishop = new Bishop(testGame.getBoard(), "testbishop", "D4", "white");
+        Pawn testPawn = new Pawn(testGame.getBoard(), "testpawn", "E6", "black");
+        testBoard.assignPiece(testKing, "F6");
+        testBoard.assignPiece(testBishop, "D4");
+        testBoard.assignPiece(testPawn, "E6");
+
+        // Put game in check
+        testGame.swapActivePlayer();
+        testGame.updateCheckState();
+        assertTrue(testGame.isInCheck());
+
+        // Make Move
+        Tile srcTile = testBoard.getTile("E6");
+        Tile targetTile = testBoard.getTile("E5");
+        testBoard.setSrcTile(srcTile);
+        testBoard.setTargetTile(targetTile);
+        assertTrue(testGame.makeMove());
+        assertEquals("E5", testPawn.getCurrentPosition());
+
+        // Game should no longer be in check
+        testGame.updateCheckState();
+        assertFalse(testGame.isInCheck());
+    }
+
+
+    @Test
+    public void testMakeMoveCapturePieceThatCausesCheck() {
+        // setup
+        Board testBoard = testGame.getBoard();
+
+        // Remove original king
+        ChessPiece ogKing = testBoard.getTile("E8").getOccupyingPiece();
+        testBoard.getTile("E8").setOccupyingPiece(null);
+        testBoard.getPieces().remove(ogKing);
+
+        // Create test pieces and assign them
+        King testKing = new King(testGame.getBoard(), "F6", "black");
+        Bishop testBishop = new Bishop(testGame.getBoard(), "testbishop", "D4", "white");
+        Pawn testPawn = new Pawn(testGame.getBoard(), "testpawn", "C5", "black");
+        testBoard.assignPiece(testKing, "F6");
+        testBoard.assignPiece(testBishop, "D4");
+        testBoard.assignPiece(testPawn, "C5");
+
+        // Put game in check
+        testGame.swapActivePlayer();
+        testGame.updateCheckState();
+        assertTrue(testGame.isInCheck());
+
+        // Make Move
+        Tile srcTile = testBoard.getTile("C5");
+        Tile targetTile = testBoard.getTile("D4");
+        testBoard.setSrcTile(srcTile);
+        testBoard.setTargetTile(targetTile);
+        assertTrue(testGame.makeMove());
+        assertEquals("D4", testPawn.getCurrentPosition());
+
+        // Game should no longer be in check
+        testGame.updateCheckState();
+        assertFalse(testGame.isInCheck());
+    }
+
+    @Test
     public void testSwapActivePlayer() {
         testGame2.swapActivePlayer();
         assertEquals("Chuck", testGame2.getActivePlayer().getName());

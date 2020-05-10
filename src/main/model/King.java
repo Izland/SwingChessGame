@@ -15,14 +15,14 @@ public class King extends ChessPiece {
     // EFFECTS: Adds all adjacent board positions to availableMoves
     public void updateAvailableMoves() {
         clearAvailableMoves();
-        availableMoves.addAll(genDirectionalPositions(1,0, 1));
-        availableMoves.addAll(genDirectionalPositions(1,1, 1));
-        availableMoves.addAll(genDirectionalPositions(0,1,1));
-        availableMoves.addAll(genDirectionalPositions(-1, 1, 1));
-        availableMoves.addAll(genDirectionalPositions(-1, 0, 1));
-        availableMoves.addAll(genDirectionalPositions(-1, -1, 1));
-        availableMoves.addAll(genDirectionalPositions(0, -1, 1));
-        availableMoves.addAll(genDirectionalPositions(1, -1, 1));
+        genDirectionalPositions(1,0, 1);
+        genDirectionalPositions(1,1, 1);
+        genDirectionalPositions(0,1,1);
+        genDirectionalPositions(-1, 1, 1);
+        genDirectionalPositions(-1, 0, 1);
+        genDirectionalPositions(-1, -1, 1);
+        genDirectionalPositions(0, -1, 1);
+        genDirectionalPositions(1, -1, 1);
     }
 
 }

@@ -27,7 +27,7 @@ public class BoardTest {
 
         pieces.add(new Bishop(testBoard,"bishop1", "C1", "white"));
         pieces.add(new Rook(testBoard, "rook1", "A1", "white"));
-        pieces.add(new Queen( testBoard, "D8", "black"));
+        pieces.add(new Queen( testBoard, "queen1", "D8", "black"));
         pieces.add(new Pawn(testBoard, "pawn7", "G7", "black"));
 
         return pieces;

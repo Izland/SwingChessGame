@@ -15,9 +15,9 @@ public class Rook extends ChessPiece {
     // EFFECTS: Adds all board positions that are in a horizontal or vertical line from the rook
     public void updateAvailableMoves() {
         clearAvailableMoves();
-        availableMoves.addAll(genDirectionalPositions(0, 1, 0));
-        availableMoves.addAll(genDirectionalPositions(1,0, 0));
-        availableMoves.addAll(genDirectionalPositions(-1, 0, 0));
-        availableMoves.addAll(genDirectionalPositions(0, -1, 0));
+        genDirectionalPositions(0, 1, 0);
+        genDirectionalPositions(1,0, 0);
+        genDirectionalPositions(-1, 0, 0);
+        genDirectionalPositions(0, -1, 0);
     }
 }

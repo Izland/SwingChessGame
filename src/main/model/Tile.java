@@ -26,6 +26,7 @@ public class Tile {
         return occupyingPiece != null;
     }
 
+    // EFFECTS: Returns true if a piece owned by the given player is present, false otherwise
     public boolean isOccupiedByTeam(Player p) {
         if (occupyingPiece == null) {
             return false;

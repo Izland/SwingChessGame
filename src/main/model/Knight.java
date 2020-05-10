@@ -16,13 +16,13 @@ public class Knight extends ChessPiece {
     // all positions that are two rows and one column away to availableMoves
     public void updateAvailableMoves() {
         clearAvailableMoves();
-        availableMoves.addAll(genDirectionalPositions(2, 1, 1));
-        availableMoves.addAll(genDirectionalPositions(2, -1, 1));
-        availableMoves.addAll(genDirectionalPositions(-2, 1, 1));
-        availableMoves.addAll(genDirectionalPositions(-2, -1, 1));
-        availableMoves.addAll(genDirectionalPositions(-1, 2, 1));
-        availableMoves.addAll(genDirectionalPositions(1,2, 1));
-        availableMoves.addAll(genDirectionalPositions(-1, -2, 1));
-        availableMoves.addAll(genDirectionalPositions(1, -2, 1));
+        genDirectionalPositions(2, 1, 1);
+        genDirectionalPositions(2, -1, 1);
+        genDirectionalPositions(-2, 1, 1);
+        genDirectionalPositions(-2, -1, 1);
+        genDirectionalPositions(-1, 2, 1);
+        genDirectionalPositions(1,2, 1);
+        genDirectionalPositions(-1, -2, 1);
+        genDirectionalPositions(1, -2, 1);
     }
 }

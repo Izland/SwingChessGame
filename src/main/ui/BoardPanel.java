@@ -57,6 +57,14 @@ public class BoardPanel extends JPanel {
         return targetTilePanel;
     }
 
+    public void refreshTilePanel(String tileCoordinate) {
+        for (TilePanel tp : tilePanelList) {
+            if (tp.getTile().getBoardCoordinate().equals(tileCoordinate)) {
+                tp.refreshTileImage();
+            }
+        }
+    }
+
     public void setSrcTilePanel(TilePanel srcTilePanel) {
         this.srcTilePanel = srcTilePanel;
     }

@@ -17,7 +17,7 @@ class QueenTest {
     @BeforeEach
     public void setup() {
         testBoard = new Board();
-        testQueen = new Queen(testBoard, "D4", "white");
+        testQueen = new Queen(testBoard, "queen1", "D4", "white");
     }
 
     @Test

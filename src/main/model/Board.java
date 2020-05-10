@@ -1,8 +1,8 @@
 package model;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 // Represent the chess board
@@ -21,15 +21,6 @@ public class Board {
         pieces = new ArrayList<>();
         initTiles();
     }
-
-//    // EFFECTS: Constructs a Board object
-//    public Board(ArrayList<ChessPiece> pieces) {
-//        boardTileMap = new HashMap<>();
-//        boardTiles = new ArrayList<>();
-//        pieces = new ArrayList<>();
-//        initTiles();
-//        loadPieces(pieces);
-//    }
 
     public Tile getTile(String boardCoordinate) {
         return boardTileMap.get(boardCoordinate);
@@ -124,30 +115,51 @@ public class Board {
         assignPiece(new Knight(this, "knight2", "G" + rowID, teamColour), "G" + rowID);
         assignPiece(new Bishop(this,"bishop1", "C" + rowID, teamColour), "C" + rowID);
         assignPiece(new Bishop(this,"bishop2", "F" + rowID, teamColour), "F" + rowID);
-        assignPiece(new Queen(this,"D" + rowID, teamColour), "D" + rowID);
+        assignPiece(new Queen(this,"queen1", "D" + rowID, teamColour), "D" + rowID);
         assignPiece(new King(this,"E" + rowID, teamColour), "E" + rowID);
     }
 
-    // MODIFIES: Tile t
-    // EFFECTS:
+    // MODIFIES: this, Tile t
+    // EFFECTS: Assigns a piece to its respective starting tile and adds it to the board
     public void assignPiece(ChessPiece piece, String tileCoordinate) {
         Tile t = getTile(tileCoordinate);
         t.setOccupyingPiece(piece);
         pieces.add(piece);
     }
 
+    // MODIFIES: this
+    // EFFECTS: Checks to see whether move is valid and if so, makes it and returns true; false otherwise
     public boolean movePiece(Player p, String srcCoordinate, String targetCoordinate) {
         if (isMoveValid(p, srcCoordinate, targetCoordinate)) {
-            Tile srcTile = boardTileMap.get(srcCoordinate);
-            Tile targetTile = boardTileMap.get(targetCoordinate);
-            ChessPiece cp = srcTile.getOccupyingPiece();
-            srcTile.setOccupyingPiece(null);
-            targetTile.setOccupyingPiece(cp);
-            cp.updateLocation(targetCoordinate);
-            updateAllPieceMoves();
+            pieces.remove(move(srcCoordinate, targetCoordinate));
             return true;
         }
         return false;
+    }
+
+    // REQUIRES: Move must be either valid or only used to check a hypothetical move
+    // MODIFIES: srcTile, targetTile, cp
+    // EFFECTS: Makes a chess move; returns and disables movepool of any piece that is on the target space
+    public ChessPiece move(String srcCoordinate, String targetCoordinate) {
+        Tile srcTile = boardTileMap.get(srcCoordinate);
+        Tile targetTile = boardTileMap.get(targetCoordinate);
+        ChessPiece pieceToDestroy = getTile(targetCoordinate).getOccupyingPiece();
+
+
+
+        ChessPiece cp = srcTile.getOccupyingPiece();
+        srcTile.setOccupyingPiece(null);
+        targetTile.setOccupyingPiece(cp);
+        cp.updateLocation(targetCoordinate);
+        updateAllPieceMoves();
+        resetMoveProperties();
+
+        if (pieceToDestroy != null) {
+            HashSet<String> movesetToDisable = pieceToDestroy.getAvailableMoves();
+            movesetToDisable.clear();
+        }
+
+        return pieceToDestroy;
     }
 
     // MODIFIES: this
@@ -171,6 +183,7 @@ public class Board {
         }
     }
 
+    // EFFECTS:
     public boolean isMoveValid(Player p, String srcCoordinate, String targetCoordinate) {
         Tile srcTile = boardTileMap.get(srcCoordinate);
         if (srcTile.isOccupied() && srcTile.isOccupiedByTeam(p)) {

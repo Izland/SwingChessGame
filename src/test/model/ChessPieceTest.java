@@ -24,6 +24,7 @@ public class ChessPieceTest {
         testBoard.assignPiece(testPiece, "C1");
         testBoard.assignPiece(testEnemyPiece, "E3");
         testBoard.assignPiece(testFriendlyPiece, "B2");
+        testBoard.updateAllPieceMoves();
     }
 
     @Test
@@ -35,14 +36,17 @@ public class ChessPieceTest {
 
     @Test
     public void testGenerateValidMovesEnemy() {
-        HashSet<String> validMoves = testPiece.genDirectionalPositions(1, 1, 3);
+        testPiece.genDirectionalPositions(1, 1, 3);
+        HashSet<String> validMoves = testPiece.getAvailableMoves();
         assertTrue(validMoves.contains("D2"));
         assertTrue(validMoves.contains("E3"));
     }
 
     @Test
     public void testGenerateValidMovesFriendly() {
-        HashSet<String> validMoves = testPiece.genDirectionalPositions(-1, 1, 3);
+        testPiece.clearAvailableMoves();
+        testPiece.genDirectionalPositions(-1, 1, 3);
+        HashSet<String> validMoves = testPiece.getAvailableMoves();
         assertEquals(0, validMoves.size());
     }
 
@@ -60,12 +64,14 @@ public class ChessPieceTest {
 
     @Test
     public void testCheckForCaptureMoveTrue() {
-        assertTrue(testPiece.checkForCaptureMove("E3"));
+        testPiece.checkForCaptureMove("E3");
+        assertTrue(testPiece.getAvailableMoves().contains("E3"));
     }
 
     @Test
     public void testCheckForCaptureMoveFalse() {
-        assertFalse(testPiece.checkForCaptureMove("B2"));
+        testPiece.checkForCaptureMove("B2");
+        assertFalse(testPiece.getAvailableMoves().contains("B2"));
     }
 
     @Test

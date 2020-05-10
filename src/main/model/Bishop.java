@@ -15,10 +15,10 @@ public class Bishop extends ChessPiece {
     // EFFECTS: Adds all diagonal board positions to availableMoves
     public void updateAvailableMoves() {
         clearAvailableMoves();
-        availableMoves.addAll(genDirectionalPositions(1, 1, 0));
-        availableMoves.addAll(genDirectionalPositions(-1, 1, 0));
-        availableMoves.addAll(genDirectionalPositions(-1, -1, 0));
-        availableMoves.addAll(genDirectionalPositions(1, -1, 0));
+        genDirectionalPositions(1, 1, 0);
+        genDirectionalPositions(-1, 1, 0);
+        genDirectionalPositions(-1, -1, 0);
+        genDirectionalPositions(1, -1, 0);
     }
 
 }
