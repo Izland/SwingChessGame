@@ -34,37 +34,17 @@ public class  GameFrame extends JFrame {
         this.setVisible(true);
     }
 
-    // REQUIRES: Function should not be initialized twice in one session
-    // MODIFIES: this, Game
-    // EFFECTS: Creates new game, set game players names and creates, configures, and places panels
-    private void initGame() {
-        isActiveGame = true;
-        game = new Game();
-        game.getPlayers().get(0).setName(this.firstPlayerName);
-        game.getPlayers().get(1).setName(this.secondPlayerName);
-        configurePanels(game);
-        placePanels();
-        this.pack();
-        this.setVisible(true);
+    // Getters and setters
+
+    public Game getGame() {
+        return game;
     }
 
-    // REQUIRES: New game button or load game button must not have already been selected
-    // MODIFIES: this
-    // EFFECTS: Creates game object from json file and then creates and displays the panels. If no save file is present,
-    // a dialog pops up for the user and states that no game is saved
-    private void loadGame() {
-        game = GameParser.parseGameData("data/savedata.json");
-        if (game == null) {
-            JOptionPane.showMessageDialog(this, "No game saved!");
-        } else {
-            isActiveGame = true;
-            loadPlayerNames(game.getPlayers());
-            configurePanels(game);
-            placePanels();
-            this.pack();
-            this.setVisible(true);
-        }
+    public boolean getIsActiveGame() {
+        return isActiveGame;
     }
+
+    // Initialization Functions
 
     // EFFECTS: Initializes and sets the sizes of each panel
     private void configurePanels(Game game) {
@@ -80,33 +60,18 @@ public class  GameFrame extends JFrame {
         gameInfoPanel.setVisible(true);
     }
 
-    // MODIFIES: this
-    // EFFECTS: Removes all panels from frame before placing panels in desired positions
-    private void placePanels() {
-        this.getContentPane().removeAll();
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        this.getContentPane().add(boardPanel, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        this.getContentPane().add(gameInfoPanel, gbc);
-    }
-    public BoardPanel getBoardPanel() {
-        return boardPanel;
-    }
-
-    public GameInfoPanel getGameInfoPanel() {
-        return gameInfoPanel;
-    }
-
-    public Game getGame() {
-        return game;
-    }
-
-    public boolean getIsActiveGame() {
-        return isActiveGame;
+    // REQUIRES: Function should not be initialized twice in one session
+    // MODIFIES: this, Game
+    // EFFECTS: Creates new game, set game players names and creates, configures, and places panels
+    private void initGame() {
+        isActiveGame = true;
+        game = new Game();
+        game.getPlayers().get(0).setName(this.firstPlayerName);
+        game.getPlayers().get(1).setName(this.secondPlayerName);
+        configurePanels(game);
+        placePanels();
+        this.pack();
+        this.setVisible(true);
     }
 
     // EFFECTS: Creates a dialog popup that lets the user choose how many human players there are
@@ -127,6 +92,38 @@ public class  GameFrame extends JFrame {
         d.add(b2);
         d.setSize(300,100);
         d.setVisible(true);
+    }
+
+    // REQUIRES: New game button or load game button must not have already been selected
+    // MODIFIES: this
+    // EFFECTS: Creates game object from json file and then creates and displays the panels. If no save file is present,
+    // a dialog pops up for the user and states that no game is saved
+    private void loadGame() {
+        game = GameParser.parseGameData("data/savedata.json");
+        if (game == null) {
+            JOptionPane.showMessageDialog(this, "No game saved!");
+        } else {
+            isActiveGame = true;
+            loadPlayerNames(game.getPlayers());
+            configurePanels(game);
+            placePanels();
+            this.pack();
+            this.setVisible(true);
+        }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Removes all panels from frame before placing panels in desired positions
+    private void placePanels() {
+        this.getContentPane().removeAll();
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        this.getContentPane().add(boardPanel, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        this.getContentPane().add(gameInfoPanel, gbc);
     }
 
     // MODIFIES: this
@@ -178,6 +175,30 @@ public class  GameFrame extends JFrame {
         this.setJMenuBar(menuBar);
     }
 
+    // EFFECTS: Adds action listeners to all the menu items
+    private void loadMenuActionListeners(JMenuItem createGame, JMenuItem loadGame, JMenuItem saveGame, JMenuItem exitGame) {
+        createGame.addActionListener(e -> initPlayerDialog());
+        loadGame.addActionListener(e -> loadGame());
+        saveGame.addActionListener(e -> GameWriter.saveGame(game, "data/savedata.json"));
+        exitGame.addActionListener(e -> System.exit(0));
+    }
+
+    // REQUIRES: players should have 2 players
+    // MODIFIES: this
+    // EFFECTS: Sets the first player's name to the player using the white pieces, while the second player is the player
+    // with the black pieces
+    private void loadPlayerNames(ArrayList<Player> players) {
+        for (Player p : players) {
+            if (p.getTeamColour().equals("white")) {
+                firstPlayerName = p.getName();
+            } else {
+                secondPlayerName = p.getName();
+            }
+        }
+    }
+
+    // Functions used during gameplay
+
     private void createConversionDialog() {
         JDialog conversionDialog = new JDialog(this, "Piece Conversion", true);
         conversionDialog.setLayout(new GridBagLayout());
@@ -207,14 +228,6 @@ public class  GameFrame extends JFrame {
 
         conversionDialog.setSize(500,150);
         conversionDialog.setVisible(true);
-    }
-
-    // EFFECTS: Adds action listeners to all the menu items
-    private void loadMenuActionListeners(JMenuItem createGame, JMenuItem loadGame, JMenuItem saveGame, JMenuItem exitGame) {
-        createGame.addActionListener(e -> initPlayerDialog());
-        loadGame.addActionListener(e -> loadGame());
-        saveGame.addActionListener(e -> GameWriter.saveGame(game, "data/savedata.json"));
-        exitGame.addActionListener(e -> System.exit(0));
     }
 
     // EFFECTS: Adds action listeners to all the menu items
@@ -253,20 +266,6 @@ public class  GameFrame extends JFrame {
         });
     }
 
-    // REQUIRES: players should have 2 players
-    // MODIFIES: this
-    // EFFECTS: Sets the first player's name to the player using the white pieces, while the second player is the player
-    // with the black pieces
-    private void loadPlayerNames(ArrayList<Player> players) {
-        for (Player p : players) {
-            if (p.getTeamColour().equals("white")) {
-                firstPlayerName = p.getName();
-            } else {
-                secondPlayerName = p.getName();
-            }
-        }
-    }
-
     public void update() {
         boardPanel.updatePanelsAfterMove();
         gameInfoPanel.updateActivePlayer();
@@ -286,6 +285,9 @@ public class  GameFrame extends JFrame {
             gameInfoPanel.removeCheck();
         }
     }
+
+
+    // Main
 
     public static void main(String[] args) {
         new GameFrame();

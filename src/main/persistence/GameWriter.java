@@ -15,27 +15,6 @@ import java.util.ArrayList;
 // Class that assists in saving game state to a JSON file that is able to be loaded on run
 public class GameWriter {
 
-    // MODIFIES: File with the value of targetFileLocation as a name
-    // EFFECTS: Saves the state of the game by converting player data to json and writing it to a file, returns true
-    // if successful, false if an IOException occurs and prints error
-    public static boolean saveGame(Game game, String targetFileLocation) {
-        // Source: https://www.codevscolor.com/java-write-json-to-file/
-        // https://howtodoinjava.com/library/json-simple-read-write-json-examples/#write-json-file
-        // https://mkyong.com/java/json-simple-example-read-and-write-json/
-        try (FileWriter file = new FileWriter(targetFileLocation)) {
-            Board board = game.getBoard();
-            JSONObject saveObject = new JSONObject();
-            saveObject.put("pieces", createPieceData(board));
-            saveObject.put("players", createPlayerData(game.getPlayers()));
-            file.write(saveObject.toJSONString());
-            file.close();
-            return true;
-        } catch (IOException e) {
-            System.out.println(e);
-        }
-        return false;
-    }
-
     // REQUIRES: Player pieces must not be 0
     // EFFECTS: Returns a JSONArray that contains ChessPiece field data of all of the player's chess pieces
     public static JSONArray createPieceData(Board b) {
@@ -68,4 +47,24 @@ public class GameWriter {
         return toSave;
     }
 
+    // MODIFIES: File with the value of targetFileLocation as a name
+    // EFFECTS: Saves the state of the game by converting player data to json and writing it to a file, returns true
+    // if successful, false if an IOException occurs and prints error
+    public static boolean saveGame(Game game, String targetFileLocation) {
+        // Source: https://www.codevscolor.com/java-write-json-to-file/
+        // https://howtodoinjava.com/library/json-simple-read-write-json-examples/#write-json-file
+        // https://mkyong.com/java/json-simple-example-read-and-write-json/
+        try (FileWriter file = new FileWriter(targetFileLocation)) {
+            Board board = game.getBoard();
+            JSONObject saveObject = new JSONObject();
+            saveObject.put("pieces", createPieceData(board));
+            saveObject.put("players", createPlayerData(game.getPlayers()));
+            file.write(saveObject.toJSONString());
+            file.close();
+            return true;
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+        return false;
+    }
 }

@@ -22,6 +22,8 @@ public class Player {
         this.isPlayersTurn = isPlayersTurn;
     }
 
+    // Getters and setters
+
     public String getName() {
         return name;
     }
@@ -41,6 +43,8 @@ public class Player {
     public void setName(String name) {
         this.name = name;
     }
+
+    // Other functions
 
     // MODIFIES: this
     // EFFECTS: Sets the players turn to true if their team colour is white, false otherwise

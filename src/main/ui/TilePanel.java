@@ -38,23 +38,13 @@ public class TilePanel extends JPanel {
         loadMouseListener();
     }
 
+    // Getters and setters
     public Tile getTile() {
         return tile;
     }
 
-    // MODIFIES: this
-    // EFFECTS: Removes any ChessPiece image and reloads a new one if a piece is occupying the object's tile
-    public void refreshTileImage() {
-        for (Component c : this.getComponents()) {
-            if (c instanceof JLabel) {
-                this.remove(c);
-                this.revalidate();
-                this.repaint();
 
-            }
-        }
-        this.loadPieceIcon();
-    }
+    // Functions used in gameplay
 
     private void addLogicToMouseClicked() {
 
@@ -119,9 +109,6 @@ public class TilePanel extends JPanel {
         });
     }
 
-
-
-
     // MODIFIES: this
     // EFFECTS: Gets any ChessPiece that occupies this object's tile and displays their associated image
     public void loadPieceIcon() {
@@ -142,4 +129,19 @@ public class TilePanel extends JPanel {
             repaint();
         }
     }
+
+    // MODIFIES: this
+    // EFFECTS: Removes any ChessPiece image and reloads a new one if a piece is occupying the object's tile
+    public void refreshTileImage() {
+        for (Component c : this.getComponents()) {
+            if (c instanceof JLabel) {
+                this.remove(c);
+                this.revalidate();
+                this.repaint();
+
+            }
+        }
+        this.loadPieceIcon();
+    }
+
 }

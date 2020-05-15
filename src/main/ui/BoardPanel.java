@@ -41,6 +41,8 @@ public class BoardPanel extends JPanel {
         loadSquares();
     }
 
+    // Getters and Setters
+
     public Board getBoard() {
         return board;
     }
@@ -53,18 +55,6 @@ public class BoardPanel extends JPanel {
         return srcTilePanel;
     }
 
-    public TilePanel getTargetTilePanel() {
-        return targetTilePanel;
-    }
-
-    public void refreshTilePanel(String tileCoordinate) {
-        for (TilePanel tp : tilePanelList) {
-            if (tp.getTile().getBoardCoordinate().equals(tileCoordinate)) {
-                tp.refreshTileImage();
-            }
-        }
-    }
-
     public void setSrcTilePanel(TilePanel srcTilePanel) {
         this.srcTilePanel = srcTilePanel;
     }
@@ -73,12 +63,21 @@ public class BoardPanel extends JPanel {
         this.targetTilePanel = targetTilePanel;
     }
 
-    // MODIFIES: srcPanel
-    // EFFECTS: Removes the red border from the srcPanel when called and updates the images on both panels
-    public void updatePanelsAfterMove() {
-        srcTilePanel.setBorder(null);
-        srcTilePanel.refreshTileImage();
-        targetTilePanel.refreshTileImage();
+    // Initialization functions
+
+    // MODIFIES: this
+    // EFFECTS: Adds 8 key-value pairs to boardCoordinates where the key is the tile number
+    // and the value is its coordinate
+    private void addBoardColumns(int rowNum) {
+        String rowString = String.valueOf(rowNum);
+        boardCoordinates.put(57 - (8 * (rowNum - 1)), "A" + rowString);
+        boardCoordinates.put(58 - (8 * (rowNum - 1)), "B" + rowString);
+        boardCoordinates.put(59 - (8 * (rowNum - 1)), "C" + rowString);
+        boardCoordinates.put(60 - (8 * (rowNum - 1)), "D" + rowString);
+        boardCoordinates.put(61 - (8 * (rowNum - 1)), "E" + rowString);
+        boardCoordinates.put(62 - (8 * (rowNum - 1)), "F" + rowString);
+        boardCoordinates.put(63 - (8 * (rowNum - 1)), "G" + rowString);
+        boardCoordinates.put(64 - (8 * (rowNum - 1)), "H" + rowString);
     }
 
     // MODIFIES: tileIdArray
@@ -122,46 +121,49 @@ public class BoardPanel extends JPanel {
         }
     }
 
-    // MODIFIES: this
-    // EFFECTS: Adds 8 key-value pairs to boardCoordinates where the key is the tile number
-    // and the value is its coordinate
-    private void addBoardColumns(int rowNum) {
-        String rowString = String.valueOf(rowNum);
-        boardCoordinates.put(57 - (8 * (rowNum - 1)), "A" + rowString);
-        boardCoordinates.put(58 - (8 * (rowNum - 1)), "B" + rowString);
-        boardCoordinates.put(59 - (8 * (rowNum - 1)), "C" + rowString);
-        boardCoordinates.put(60 - (8 * (rowNum - 1)), "D" + rowString);
-        boardCoordinates.put(61 - (8 * (rowNum - 1)), "E" + rowString);
-        boardCoordinates.put(62 - (8 * (rowNum - 1)), "F" + rowString);
-        boardCoordinates.put(63 - (8 * (rowNum - 1)), "G" + rowString);
-        boardCoordinates.put(64 - (8 * (rowNum - 1)), "H" + rowString);
+    // EFFECTS: Adds image of ChessPiece to each TilePanel that has a tile that is occupied
+    public void loadPieces() {
+        for (TilePanel tp : tilePanelList) {
+            tp.loadPieceIcon();
+        }
     }
 
     // MODIFIES: this
     // EFFECTS: Creates and adds tile panels to object that appear to look like a chess board
     private void loadSquares() {
         for (int i = 1; i < 65; i++) {
+            Tile boardTile = board.getTile(boardCoordinates.get(i));
+            TilePanel tp;
             if (whiteTileIds.contains(i)) {
-                Tile boardTile = board.getTile(boardCoordinates.get(i));
-                TilePanel tp = new TilePanel(gameFrame, game, this, boardTile, "white");
+                tp = new TilePanel(gameFrame, game, this, boardTile, "white");
                 tp.setBackground(new Color(255,206,158));
-                tilePanelList.add(tp);
-                this.add(tp);
             } else {
-                Tile boardTile = board.getTile(boardCoordinates.get(i));
-                TilePanel tp = new TilePanel(gameFrame, game, this,boardTile, "black");
+                tp = new TilePanel(gameFrame, game, this, boardTile, "black");
                 tp.setBackground(new Color(209,139,71));
-                tilePanelList.add(tp);
-                this.add(tp);
+            }
+            tilePanelList.add(tp);
+            this.add(tp);
+        }
+    }
+
+    // Functions to run during gameplay
+
+    // EFFECTS: Searches for the tile panel with given coordinate and refreshes it if found
+    public void refreshTilePanel(String tileCoordinate) {
+        for (TilePanel tp : tilePanelList) {
+            Tile t = tp.getTile();
+            if (t.getBoardCoordinate().equals(tileCoordinate)) {
+                tp.refreshTileImage();
             }
         }
     }
 
-    // EFFECTS: Adds image of ChessPiece to each TilePanel that has a tile that is occupied
-    public void loadPieces() {
-        for (TilePanel tp : tilePanelList) {
-            tp.loadPieceIcon();
-        }
+    // MODIFIES: srcPanel
+    // EFFECTS: Removes the red border from the srcPanel when called and updates the images on both panels
+    public void updatePanelsAfterMove() {
+        srcTilePanel.setBorder(null);
+        srcTilePanel.refreshTileImage();
+        targetTilePanel.refreshTileImage();
     }
 
 }

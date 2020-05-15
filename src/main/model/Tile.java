@@ -3,12 +3,14 @@ package model;
 //Represents the tiles on the board
 public class Tile {
 
-    private String boardCoordinate;
+    private final String boardCoordinate;
     private ChessPiece occupyingPiece;
 
     Tile(String boardCoordinate) {
         this.boardCoordinate = boardCoordinate;
     }
+
+    // Getters and setters
 
     public String getBoardCoordinate() {
         return boardCoordinate;
@@ -22,6 +24,9 @@ public class Tile {
         this.occupyingPiece = occupyingPiece;
     }
 
+    // Other functions
+
+    // EFFECTS: If there is a piece on this tile, return true otherwise false
     public boolean isOccupied() {
         return occupyingPiece != null;
     }

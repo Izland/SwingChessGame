@@ -28,6 +28,8 @@ public abstract class ChessPiece {
         this.updateAvailableMoves();
     }
 
+    // Getters and setters
+
     public String getColour() {
         return colour;
     }
@@ -50,6 +52,36 @@ public abstract class ChessPiece {
 
     public void setBoard(Board b) {
         board = b;
+    }
+
+    // Other functions
+
+    // REQUIRES: targetBoardSquare must be a valid
+    // EFFECTS: Returns true if target space is occupied, false otherwise
+    public boolean canGenerateMoreMoves(String targetBoardSquare) {
+        return !board.getTile(targetBoardSquare).isOccupied();
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Adds move to the piece's available moves if the target square contains an enemy piece
+    public void checkForCaptureMove(String targetBoardSquare) {
+        if (targetBoardSquare == null) {
+            return;
+        }
+        ChessPiece cp = board.getTile(targetBoardSquare).getOccupyingPiece();
+        if (cp == null) {
+            return;
+        }
+        if (!cp.getColour().equals(colour)) {
+            availableMoves.add(targetBoardSquare);
+        }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Clear available moves
+    public void clearAvailableMoves() {
+        // Source: http://www.java2novice.com/java-collections-and-util/hashset/delete-all/
+        availableMoves.clear();
     }
 
     // EFFECTS: If numPositions = 0, return all possible moves in a single direction, otherwise return only the
@@ -135,11 +167,14 @@ public abstract class ChessPiece {
         checkForCaptureMove(rightDiagonalMove);
     }
 
-    // MODIFIES: this
-    // EFFECTS: Clear available moves
-    public void clearAvailableMoves() {
-        // Source: http://www.java2novice.com/java-collections-and-util/hashset/delete-all/
-        availableMoves.clear();
+
+    // EFFECTS: Returns true if hashCodes are within given min and max values, false otherwise
+    public boolean isPositionValid(int columnHashCode, int rowHashCode) {
+
+        if (columnHashCode < minColumnValue || columnHashCode > maxColumnValue) {
+            return false;
+        }
+        return rowHashCode >= minRowValue && rowHashCode <= maxRowValue;
     }
 
     // REQUIRES: columnTranslation & rowTranslation shouldn't both be 0
@@ -160,36 +195,6 @@ public abstract class ChessPiece {
         return null;
     }
 
-    // EFFECTS: Returns true if hashCodes are within given min and max values, false otherwise
-    public boolean isPositionValid(int columnHashCode, int rowHashCode) {
-
-        if (columnHashCode < minColumnValue || columnHashCode > maxColumnValue) {
-            return false;
-        }
-        return rowHashCode >= minRowValue && rowHashCode <= maxRowValue;
-    }
-
-
-    // REQUIRES: targetBoardSquare must be a valid
-    // EFFECTS: Returns true if target space is occupied, false otherwise
-    public boolean canGenerateMoreMoves(String targetBoardSquare) {
-        return !board.getTile(targetBoardSquare).isOccupied();
-    }
-
-    // MODIFIES: this
-    // EFFECTS: Adds move to the piece's available moves if the target square contains an enemy piece
-    public void checkForCaptureMove(String targetBoardSquare) {
-        if (targetBoardSquare == null) {
-            return;
-        }
-        ChessPiece cp = board.getTile(targetBoardSquare).getOccupyingPiece();
-        if (cp == null) {
-            return;
-        }
-        if (!cp.getColour().equals(colour)) {
-            availableMoves.add(targetBoardSquare);
-        }
-    }
 
     public abstract void updateAvailableMoves();
 
