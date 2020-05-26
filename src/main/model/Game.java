@@ -170,7 +170,7 @@ public class Game {
     // EFFECTS: Iterates through every chess piece on the board and adds
     private void findKings() {
         ArrayList<ChessPiece> pieces = board.getPieces();
-        ArrayList<King> kings = new ArrayList<>();
+        kings = new ArrayList<>();
 
         for (ChessPiece cp : pieces) {
             if (cp.getPieceType().equals("king")) {
