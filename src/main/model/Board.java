@@ -127,15 +127,15 @@ public class Board {
         pieces.add(piece);
     }
 
-    // MODIFIES: this
-    // EFFECTS: Checks to see whether move is valid and if so, makes it and returns true; false otherwise
-    public boolean movePiece(Player p, String srcCoordinate, String targetCoordinate) {
-        if (isMoveValid(p, srcCoordinate, targetCoordinate)) {
-            pieces.remove(move(srcCoordinate, targetCoordinate));
-            return true;
-        }
-        return false;
-    }
+//    // MODIFIES: this
+//    // EFFECTS: Checks to see whether move is valid and if so, makes it and returns true; false otherwise
+//    public boolean movePiece(Player p, String srcCoordinate, String targetCoordinate) {
+//        if (isMoveValid(p, srcCoordinate, targetCoordinate)) {
+//            pieces.remove(move(srcCoordinate, targetCoordinate));
+//            return true;
+//        }
+//        return false;
+//    }
 
     // REQUIRES: Move must be either valid or only used to check a hypothetical move
     // MODIFIES: srcTile, targetTile, cp
@@ -145,18 +145,16 @@ public class Board {
         Tile targetTile = boardTileMap.get(targetCoordinate);
         ChessPiece pieceToDestroy = getTile(targetCoordinate).getOccupyingPiece();
 
-
-
         ChessPiece cp = srcTile.getOccupyingPiece();
         srcTile.setOccupyingPiece(null);
         targetTile.setOccupyingPiece(cp);
         cp.updateLocation(targetCoordinate);
-        updateAllPieceMoves();
         resetMoveProperties();
 
         if (pieceToDestroy != null) {
-            HashSet<String> movesetToDisable = pieceToDestroy.getAvailableMoves();
-            movesetToDisable.clear();
+            pieces.remove(pieceToDestroy);
+//            HashSet<String> movesetToDisable = pieceToDestroy.getAvailableMoves();
+//            movesetToDisable.clear();
         }
 
         return pieceToDestroy;
@@ -164,10 +162,14 @@ public class Board {
 
     // MODIFIES: this
     // EFFECTS: Updates every piece's available moves
-    public void updateAllPieceMoves() {
+    public HashMap<ChessPiece, HashSet<String>> updateAllPieceMoves() {
+        HashMap<ChessPiece, HashSet<String>> updatedMovePool = new HashMap<>();
         for (ChessPiece p : pieces) {
             p.updateAvailableMoves();
+            updatedMovePool.put(p, p.getAvailableMoves());
         }
+
+        return updatedMovePool;
     }
 
     // REQUIRES: All ChessPiece objects should have unique currentPositions

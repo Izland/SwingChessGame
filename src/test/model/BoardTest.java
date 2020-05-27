@@ -198,26 +198,6 @@ public class BoardTest {
     }
 
     @Test
-    public void testMovePieceValid() {
-        Player testPlayer = new Player("white");
-        assertTrue(testBoard.getTile("C2").isOccupied());
-        assertFalse(testBoard.getTile("C4").isOccupied());
-        assertTrue(testBoard.movePiece(testPlayer, "C2", "C4"));
-        assertFalse(testBoard.getTile("C2").isOccupied());
-        assertTrue(testBoard.getTile("C4").isOccupied());
-    }
-
-    @Test
-    public void testMovePieceInvalid() {
-        Player testPlayer = new Player("white");
-        assertTrue(testBoard.getTile("A1").isOccupied());
-        assertFalse(testBoard.getTile("C3").isOccupied());
-        assertFalse(testBoard.movePiece(testPlayer, "A1", "C3"));
-        assertTrue(testBoard.getTile("A1").isOccupied());
-        assertFalse(testBoard.getTile("C3").isOccupied());
-    }
-
-    @Test
     public void testLoadPieces() {
         ArrayList<ChessPiece> testPieces = new ArrayList<>();
         testPieces.add(new Rook(testBoard,"rook3", "A4", "white"));

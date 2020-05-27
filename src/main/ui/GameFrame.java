@@ -237,32 +237,24 @@ public class  GameFrame extends JFrame {
             String tileLocation = game.getPawnToConvert().getCurrentPosition();
             game.convertPawn("queen");
             boardPanel.refreshTilePanel(tileLocation);
-            game.getBoard().updateAllPieceMoves();
-            game.checkForMovesToUncheck();
         });
         bishopButton.addActionListener(e -> {
             dialog.setVisible(false);
             String tileLocation = game.getPawnToConvert().getCurrentPosition();
             game.convertPawn("bishop");
             boardPanel.refreshTilePanel(tileLocation);
-            game.getBoard().updateAllPieceMoves();
-            game.checkForMovesToUncheck();
         });
         knightButton.addActionListener(e -> {
             dialog.setVisible(false);
             String tileLocation = game.getPawnToConvert().getCurrentPosition();
             game.convertPawn("knight");
             boardPanel.refreshTilePanel(tileLocation);
-            game.getBoard().updateAllPieceMoves();
-            game.checkForMovesToUncheck();
         });
         rookButton.addActionListener(e -> {
             dialog.setVisible(false);
             String tileLocation = game.getPawnToConvert().getCurrentPosition();
             game.convertPawn("rook");
             boardPanel.refreshTilePanel(tileLocation);
-            game.getBoard().updateAllPieceMoves();
-            game.checkForMovesToUncheck();
         });
     }
 
@@ -275,11 +267,11 @@ public class  GameFrame extends JFrame {
 
         }
         if (game.isInCheck()) {
-            game.checkForMovesToUncheck();
-            gameInfoPanel.addCheck();
             if (game.checkForWinCondition()) {
                 isActiveGame = false;
                 gameInfoPanel.updateWinner();
+            } else {
+                gameInfoPanel.addCheck();
             }
         } else {
             gameInfoPanel.removeCheck();

@@ -11,7 +11,7 @@ public class Game {
     private boolean inCheck;
     private ArrayList<King> kings;
     private King kingInCheck;
-    private HashMap<ChessPiece, HashSet<String>> possibleMoves;
+    private HashMap<ChessPiece, HashSet<String>> gameMovePool;
     private String winner;
     private ChessPiece pawnToConvert;
 
@@ -20,13 +20,14 @@ public class Game {
         this.board = new Board();
         initializePlayers();
         board.initPieces();
-        possibleMoves = new HashMap<>();
+        gameMovePool = board.updateAllPieceMoves();
         findKings();
     }
 
     public Game(ArrayList<Player> players, Board board) {
         loadPlayers(players);
         this.board = board;
+        gameMovePool = board.updateAllPieceMoves();
         findKings();
     }
 
@@ -51,8 +52,13 @@ public class Game {
     public ArrayList<King> getKings() {
         return kings;
     }
+
     public String getWinner() {
         return winner;
+    }
+
+    public HashMap<ChessPiece, HashSet<String>> getGameMovePool() {
+        return gameMovePool;
     }
 
     public void setBoard(Board board) {
@@ -65,40 +71,6 @@ public class Game {
 
     public boolean canAPawnBeConverted() {
         return pawnToConvert != null;
-    }
-
-    // MODIFIES: this
-    // EFFECTS: Adds move to the set of possible moves
-    public void addMoveToPossibleMoves(HashMap<ChessPiece, HashSet<String>> possibleMoves, ChessPiece cp, String move) {
-
-        HashSet<String> pieceMoves = possibleMoves.get(cp);
-
-        if (pieceMoves == null) {
-            pieceMoves = new HashSet<>();
-            pieceMoves.add(move);
-            possibleMoves.put(cp, pieceMoves);
-        } else {
-            pieceMoves.add(move);
-        }
-    }
-
-    // EFFECTS: Iterates through each possible move to determine if moves that prevent being in check exist
-    // and adds them to the possible moves if so.
-    public void checkForMovesToUncheck() {
-        String kingColour = kingInCheck.getColour();
-
-        possibleMoves = new HashMap<>();
-
-        for (ChessPiece cp : board.getPieces()) {
-            if (cp.getColour().equals(kingColour)) {
-                HashSet<String> availableMoves = generateModifiableHashSet(cp.getAvailableMoves());
-                for (String move : availableMoves) {
-                    if (checkMove( cp, move)) {
-                        addMoveToPossibleMoves(possibleMoves, cp, move);
-                    }
-                }
-            }
-        }
     }
 
     // MODIFIES: this
@@ -115,7 +87,7 @@ public class Game {
     // MODIFIES: this
     // EFFECTS: Checks to see if any move is possible and if not, sets the winner and returns true; false otherwise
     public boolean checkForWinCondition() {
-        if (possibleMoves.isEmpty()) {
+        if (gameMovePool.isEmpty()) {
             for (Player p : players) {
                 if (!p.equals(activePlayer)) {
                     winner = p.getName();
@@ -135,17 +107,19 @@ public class Game {
 
         // Makes the hypothetical move
         board.move(srcBoardSquare, targetBoardSquare);
+        board.updateAllPieceMoves();
 
         // Checks to see if it puts the active player in check
         boolean activePlayerInCheck = willMovePutActivePlayerInCheck();
 
         // Undoes the move
         board.move(targetBoardSquare, srcBoardSquare);
+        board.updateAllPieceMoves();
 
         // Resets the properties of both the original piece and any piece that was on the target square
         if (occupyingPiece != null) {
+            board.assignPiece(occupyingPiece, targetBoardSquare);
             occupyingPiece.updateAvailableMoves();
-            targetTile.setOccupyingPiece(occupyingPiece);
             cp.updateAvailableMoves();
         }
         return !activePlayerInCheck;
@@ -166,6 +140,29 @@ public class Game {
         pawnToConvert = null;
     }
 
+    private void filterMovesForCheck() {
+        String kingColour = kingInCheck.getColour();
+        HashMap<ChessPiece, HashSet<String>> filteredMovePool = new HashMap<>();
+        for (ChessPiece cp : gameMovePool.keySet()) {
+            if (cp.getColour().equals(kingColour)) {
+                HashSet<String> currentPieceMovePool = generateModifiableHashSet(gameMovePool.get(cp));
+                for (String move : currentPieceMovePool) {
+                    if (checkMove(cp, move)) {
+                        HashSet<String> pieceEntry = filteredMovePool.get(cp);
+                        if (pieceEntry == null) {
+                            pieceEntry = new HashSet<>();
+                            pieceEntry.add(move);
+                            filteredMovePool.put(cp, pieceEntry);
+                        } else {
+                            pieceEntry.add(move);
+                        }
+                    }
+                }
+            }
+        }
+        gameMovePool = filteredMovePool;
+    }
+
     // MODIFIES: this
     // EFFECTS: Iterates through every chess piece on the board and adds
     private void findKings() {
@@ -180,11 +177,6 @@ public class Game {
         }
     }
 
-    // EFFECTS: Creates a new hashset that can be modified
-    public HashSet<String> generateModifiableHashSet(HashSet<String> moveSet) {
-        return new HashSet<>(moveSet);
-    }
-
     // REQUIRES: pieceType must be either "pawn", "knight", "bishop", "rook", "queen", "king"
     // EFFECTS: Checks the ids of each chess piece with type pieceType and returns the highest number found in string form
     public String getHighestPieceID(String pieceType) {
@@ -197,6 +189,11 @@ public class Game {
             }
         }
         return String.valueOf(highestPieceID);
+    }
+
+    // EFFECTS: Creates a new hashset that can be modified
+    public HashSet<String> generateModifiableHashSet(HashSet<String> moveSet) {
+        return new HashSet<>(moveSet);
     }
 
     // MODIFIES: this
@@ -218,8 +215,8 @@ public class Game {
         }
     }
 
-    // EFFECTS: Selects piece based on user input and moves it to their target position if valid, then
-    // passes the turn to the other player
+    // MODIFIES: this
+    // EFFECTS: Returns true if a successful move is made (move is in pool of available moves), false otherwise
     public boolean makeMove() {
         Tile srcTile = board.getSrcTile();
         Tile targetTile = board.getTargetTile();
@@ -227,24 +224,21 @@ public class Game {
         String targetTileBoardCoordinate = targetTile.getBoardCoordinate();
         ChessPiece srcPiece = srcTile.getOccupyingPiece();
 
-        if (checkMove(srcPiece, targetTileBoardCoordinate) && board.movePiece(activePlayer, srcTileBoardCoordinate, targetTileBoardCoordinate)) {
-            removeAnyDeadPieceFromGame();
-            swapActivePlayer();
-            updateCheckState();
+        if (gameMovePool.containsKey(srcPiece) && gameMovePool.get(srcPiece).contains(targetTileBoardCoordinate)) {
+            ChessPiece pieceToDestroy = board.move(srcTileBoardCoordinate, targetTileBoardCoordinate);
+            gameMovePool.remove(pieceToDestroy);
             checkForPawnToConvert();
+            gameMovePool = board.updateAllPieceMoves();
+            updateCheckState();
+            swapActivePlayer();
 
             if (inCheck) {
-                checkForMovesToUncheck();
+                filterMovesForCheck();
             }
+
             return true;
         }
         return false;
-    }
-
-    // MODIFIES: this
-    // EFFECTS: Removes any trace of a dead piece from the game state
-    public void removeAnyDeadPieceFromGame() {
-        possibleMoves.keySet().removeIf(cp -> !board.getPieces().contains(cp));
     }
 
     // MODIFIES: this
