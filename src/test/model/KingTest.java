@@ -30,8 +30,9 @@ class KingTest {
     @Test
     public void testUpdateAvailableMoves() {
         String[] availableMoves = {"D1", "D2", "D3", "E3", "F3", "F2", "F1", "E1"};
-        HashSet<String> availableMoveSet = new HashSet<>(Arrays.asList(availableMoves));
-        testKing.updateAvailableMoves();
-        assertTrue(availableMoveSet.containsAll(testKing.availableMoves));
+        for (String targetBoardCoordinate : availableMoves) {
+            Move moveToTest = new Move(testBoard, testKing, testKing.currentPosition, targetBoardCoordinate);
+            assertTrue(testKing.availableMoves.contains(moveToTest));
+        }
     }
 }

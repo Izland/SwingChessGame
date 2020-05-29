@@ -81,6 +81,8 @@ public class GameTest {
         Pawn testPawn = new Pawn(testGame.getBoard(), "pawn1", "D4", "white");
         testBoard.assignPiece(testKing, "E5");
         testBoard.assignPiece(testPawn, "D4");
+        testBoard.updateAllPieceMoves();
+        testGame.findKings();
 
         // Put game in check
         testGame.swapActivePlayer();
@@ -117,6 +119,8 @@ public class GameTest {
         Pawn testPawn = new Pawn(testGame.getBoard(), "pawn1", "D4", "white");
         testBoard.assignPiece(testKing, "E5");
         testBoard.assignPiece(testPawn, "D4");
+        testBoard.updateAllPieceMoves();
+        testGame.findKings();
 
         // Put game in check
         testGame.swapActivePlayer();
@@ -151,6 +155,7 @@ public class GameTest {
         Bishop testBishop = new Bishop(testGame.getBoard(), "bishop", "D4", "white");
         testBoard.assignPiece(testKing, "E5");
         testBoard.assignPiece(testBishop, "D4");
+        testGame.findKings();
 
         // Put game in check
         testGame.swapActivePlayer();
@@ -186,6 +191,7 @@ public class GameTest {
         Pawn testPawn = (Pawn) testBoard.getTile("B7").getOccupyingPiece();
         testBoard.assignPiece(testKing, "E5");
         testBoard.assignPiece(testBishop, "D4");
+        testBoard.updateAllPieceMoves();
 
         // Put game in check
         testGame.swapActivePlayer();
@@ -222,6 +228,8 @@ public class GameTest {
         testBoard.assignPiece(testKing, "F6");
         testBoard.assignPiece(testBishop, "D4");
         testBoard.assignPiece(testPawn, "E6");
+        testBoard.updateAllPieceMoves();
+        testGame.findKings();
 
         // Put game in check
         testGame.swapActivePlayer();
@@ -258,6 +266,8 @@ public class GameTest {
         testBoard.assignPiece(testKing, "F6");
         testBoard.assignPiece(testBishop, "D4");
         testBoard.assignPiece(testPawn, "E6");
+        testBoard.updateAllPieceMoves();
+        testGame.findKings();
 
         // Put game in check
         testGame.swapActivePlayer();
@@ -295,6 +305,8 @@ public class GameTest {
         testBoard.assignPiece(testKing, "F6");
         testBoard.assignPiece(testBishop, "D4");
         testBoard.assignPiece(testPawn, "C5");
+        testGame.findKings();
+        testBoard.updateAllPieceMoves();
 
         // Put game in check
         testGame.swapActivePlayer();

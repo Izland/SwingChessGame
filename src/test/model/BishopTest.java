@@ -30,8 +30,9 @@ class BishopTest {
     @Test
     public void testUpdateAvailableMoves() {
         String[] availableMoves = {"D2", "C1", "D4", "C5", "B6", "A7", "F4", "G5", "H6", "F2", "G1"};
-        HashSet<String> availableMoveSet = new HashSet<>(Arrays.asList(availableMoves));
-        testBishop.updateAvailableMoves();
-        assertTrue(availableMoveSet.containsAll(testBishop.availableMoves));
+        for (String targetBoardCoordinate : availableMoves) {
+            Move moveToTest = new Move(testBoard, testBishop, testBishop.currentPosition, targetBoardCoordinate);
+            assertTrue(testBishop.availableMoves.contains(moveToTest));
+        }
     }
 }

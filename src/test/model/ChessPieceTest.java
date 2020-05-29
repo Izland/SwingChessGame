@@ -3,6 +3,7 @@ package model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,22 +38,22 @@ public class ChessPieceTest {
     @Test
     public void testGenerateValidMovesEnemy() {
         testPiece.genDirectionalPositions(1, 1, 3);
-        HashSet<String> validMoves = testPiece.getAvailableMoves();
-        assertTrue(validMoves.contains("D2"));
-        assertTrue(validMoves.contains("E3"));
+        ArrayList<Move> validMoves = testPiece.getAvailableMoves();
+        assertTrue(validMoves.contains(new Move(testBoard, testPiece, "C1", "D2")));
+        assertTrue(validMoves.contains(new Move(testBoard, testPiece, "C1", "E3")));
     }
 
     @Test
     public void testGenerateValidMovesFriendly() {
         testPiece.clearAvailableMoves();
         testPiece.genDirectionalPositions(-1, 1, 3);
-        HashSet<String> validMoves = testPiece.getAvailableMoves();
+        ArrayList<Move> validMoves = testPiece.getAvailableMoves();
         assertEquals(0, validMoves.size());
     }
 
     @Test
     public void testValidTranslatePosition() {
-        assertEquals("D2", testPiece.translatePosition(1,1));
+        assertEquals(new Move(testBoard, testPiece, "C1", "D2"), testPiece.translatePosition(1,1));
     }
 
     @Test
@@ -64,14 +65,16 @@ public class ChessPieceTest {
 
     @Test
     public void testCheckForCaptureMoveTrue() {
-        testPiece.checkForCaptureMove("E3");
-        assertTrue(testPiece.getAvailableMoves().contains("E3"));
+        Move testMove = new Move(testBoard, testPiece, testPiece.currentPosition, "E3");
+        testPiece.checkForCaptureMove(testMove);
+        assertTrue(testPiece.getAvailableMoves().contains(testMove));
     }
 
     @Test
     public void testCheckForCaptureMoveFalse() {
-        testPiece.checkForCaptureMove("B2");
-        assertFalse(testPiece.getAvailableMoves().contains("B2"));
+        Move testMove = new Move(testBoard, testPiece, testPiece.currentPosition, "B2");
+        testPiece.checkForCaptureMove(testMove);
+        assertFalse(testPiece.getAvailableMoves().contains(testMove));
     }
 
     @Test

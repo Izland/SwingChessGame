@@ -13,6 +13,7 @@ public class Board {
     private ArrayList<ChessPiece> pieces;
     private Tile srcTile;
     private Tile targetTile;
+    private ArrayList<Move> movePool;
 
     // EFFECTS: Constructs a Board object
     public Board() {
@@ -36,6 +37,10 @@ public class Board {
 
     public ArrayList<ChessPiece> getPieces() {
         return pieces;
+    }
+
+    public ArrayList<Move> getMovePool() {
+        return movePool;
     }
 
     public Map<String, Tile> getBoardTileMap() {
@@ -127,23 +132,29 @@ public class Board {
         pieces.add(piece);
     }
 
-//    // MODIFIES: this
-//    // EFFECTS: Checks to see whether move is valid and if so, makes it and returns true; false otherwise
-//    public boolean movePiece(Player p, String srcCoordinate, String targetCoordinate) {
-//        if (isMoveValid(p, srcCoordinate, targetCoordinate)) {
-//            pieces.remove(move(srcCoordinate, targetCoordinate));
-//            return true;
-//        }
-//        return false;
-//    }
+    public int evaluateBoardState() {
+        int whiteTeamScore = 0;
+        int blackTeamScore = 0;
+        for (ChessPiece cp : pieces) {
+            if (cp.getColour().equals("white")) {
+                whiteTeamScore++;
+            } else {
+                blackTeamScore++;
+            }
+        }
+        return whiteTeamScore - blackTeamScore;
+
+    }
 
     // REQUIRES: Move must be either valid or only used to check a hypothetical move
     // MODIFIES: srcTile, targetTile, cp
     // EFFECTS: Makes a chess move; returns and disables movepool of any piece that is on the target space
-    public ChessPiece move(String srcCoordinate, String targetCoordinate) {
+    public void move(Move move) {
+        String srcCoordinate = move.getSrcTileCoordinate();
+        String targetCoordinate = move.getTargetTileCoordinate();
         Tile srcTile = boardTileMap.get(srcCoordinate);
         Tile targetTile = boardTileMap.get(targetCoordinate);
-        ChessPiece pieceToDestroy = getTile(targetCoordinate).getOccupyingPiece();
+        ChessPiece pieceToDestroy = targetTile.getOccupyingPiece();
 
         ChessPiece cp = srcTile.getOccupyingPiece();
         srcTile.setOccupyingPiece(null);
@@ -153,23 +164,18 @@ public class Board {
 
         if (pieceToDestroy != null) {
             pieces.remove(pieceToDestroy);
-//            HashSet<String> movesetToDisable = pieceToDestroy.getAvailableMoves();
-//            movesetToDisable.clear();
         }
 
-        return pieceToDestroy;
     }
 
     // MODIFIES: this
     // EFFECTS: Updates every piece's available moves
-    public HashMap<ChessPiece, HashSet<String>> updateAllPieceMoves() {
-        HashMap<ChessPiece, HashSet<String>> updatedMovePool = new HashMap<>();
+    public void updateAllPieceMoves() {
+        movePool = new ArrayList<>();
         for (ChessPiece p : pieces) {
             p.updateAvailableMoves();
-            updatedMovePool.put(p, p.getAvailableMoves());
+            movePool.addAll(p.getAvailableMoves());
         }
-
-        return updatedMovePool;
     }
 
     // REQUIRES: All ChessPiece objects should have unique currentPositions
@@ -183,15 +189,17 @@ public class Board {
         for (ChessPiece cp : piecesToLoad) {
             assignPiece(cp, cp.getCurrentPosition());
         }
+        updateAllPieceMoves();
     }
 
     // EFFECTS:
-    public boolean isMoveValid(Player p, String srcCoordinate, String targetCoordinate) {
-        Tile srcTile = boardTileMap.get(srcCoordinate);
+    public boolean isMoveValid(Player p, Move move) {
+        Tile srcTile = boardTileMap.get(move.getSrcTileCoordinate());
+        String targetCoordinate = move.getTargetTileCoordinate();
         if (srcTile.isOccupied() && srcTile.isOccupiedByTeam(p)) {
             Tile targetTile = boardTileMap.get(targetCoordinate);
             ChessPiece cp = srcTile.getOccupyingPiece();
-            return cp.getAvailableMoves().contains(targetCoordinate) && !targetTile.isOccupiedByTeam(p);
+            return cp.getAvailableMoves().contains(move) && !targetTile.isOccupiedByTeam(p);
         }
         return false;
     }

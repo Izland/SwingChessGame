@@ -1,6 +1,7 @@
 package model;
 
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 // Represents all of the chess pieces in the game that a player can utilize and move
@@ -14,7 +15,7 @@ public abstract class ChessPiece {
     protected String pieceType;
     protected String currentPosition;
     protected String colour;
-    protected HashSet<String> availableMoves;
+    protected ArrayList<Move> availableMoves;
     protected Board board;
 
     // EFFECTS: Creates a chesspiece and initializes the piece's starting moves
@@ -24,7 +25,7 @@ public abstract class ChessPiece {
         this.pieceID = pieceID;
         this.currentPosition = currentPosition;
         this.colour = colour;
-        availableMoves = new HashSet<>();
+        availableMoves = new ArrayList<>();
         this.updateAvailableMoves();
     }
 
@@ -46,7 +47,7 @@ public abstract class ChessPiece {
         return pieceID;
     }
 
-    public HashSet<String> getAvailableMoves() {
+    public ArrayList<Move> getAvailableMoves() {
         return availableMoves;
     }
 
@@ -58,22 +59,22 @@ public abstract class ChessPiece {
 
     // REQUIRES: targetBoardSquare must be a valid
     // EFFECTS: Returns true if target space is occupied, false otherwise
-    public boolean canGenerateMoreMoves(String targetBoardSquare) {
-        return !board.getTile(targetBoardSquare).isOccupied();
+    public boolean canGenerateMoreMoves(Move move) {
+        return !board.getTile(move.getTargetTileCoordinate()).isOccupied();
     }
 
     // MODIFIES: this
     // EFFECTS: Adds move to the piece's available moves if the target square contains an enemy piece
-    public void checkForCaptureMove(String targetBoardSquare) {
-        if (targetBoardSquare == null) {
+    public void checkForCaptureMove(Move move) {
+        if (move == null) {
             return;
         }
-        ChessPiece cp = board.getTile(targetBoardSquare).getOccupyingPiece();
+        ChessPiece cp = move.getPieceOnTargetTile();
         if (cp == null) {
             return;
         }
         if (!cp.getColour().equals(colour)) {
-            availableMoves.add(targetBoardSquare);
+            availableMoves.add(move);
         }
     }
 
@@ -87,7 +88,7 @@ public abstract class ChessPiece {
     // EFFECTS: If numPositions = 0, return all possible moves in a single direction, otherwise return only the
     // specified number of positions in that direction
     public void genDirectionalPositions(int columnTranslation, int rowTranslation, int numPositions) {
-        String translatedPosition;
+        Move translatedPosition;
 
         if (numPositions == 0) {
             translatedPosition = generateMovesToBoardLimit(columnTranslation, rowTranslation);
@@ -100,10 +101,10 @@ public abstract class ChessPiece {
     // MODIFIES: this
     // EFFECTS: Generates and adds moves until the limits of the board edge are reached and returns null,
     // or a piece occupies a potential move and returns it
-    private String generateMovesToBoardLimit(int columnTranslation, int rowTranslation) {
+    private Move generateMovesToBoardLimit(int columnTranslation, int rowTranslation) {
         int totalColumnTranslation = columnTranslation;
         int totalRowTranslation = rowTranslation;
-        String translatedPosition = translatePosition(totalColumnTranslation, totalRowTranslation);
+        Move translatedPosition = translatePosition(totalColumnTranslation, totalRowTranslation);
 
         while (translatedPosition != null && canGenerateMoreMoves(translatedPosition)) {
             availableMoves.add(translatePosition(totalColumnTranslation, totalRowTranslation));
@@ -118,10 +119,10 @@ public abstract class ChessPiece {
     // MODIFIES: this
     // EFFECTS: Generates and adds moves until the limit is reached or another piece occupies a potential move and returns its location;
     // returns null if limit is successfully reached
-    private String generateMovesToPieceLimit(int columnTranslation, int rowTranslation, int numPositions) {
+    private Move generateMovesToPieceLimit(int columnTranslation, int rowTranslation, int numPositions) {
         int totalColumnTranslation = columnTranslation;
         int totalRowTranslation = rowTranslation;
-        String translatedPosition;
+        Move translatedPosition;
 
         for (int i = 0; i < numPositions; i++) {
             translatedPosition = translatePosition(totalColumnTranslation, totalRowTranslation);
@@ -143,8 +144,8 @@ public abstract class ChessPiece {
     // EFFECTS: Creates and adds a moveset to a pawn which has contents that depend on its colour and adjacent pieces.
     protected void generateMoveSetForPawn() {
         String rowNumber = currentPosition.substring(1);
-        String leftDiagonalMove;
-        String rightDiagonalMove;
+        Move leftDiagonalMove;
+        Move rightDiagonalMove;
 
         if (colour.equals("white")) {
             if (rowNumber.equals("2") || rowNumber.equals("7")) {
@@ -179,7 +180,7 @@ public abstract class ChessPiece {
 
     // REQUIRES: columnTranslation & rowTranslation shouldn't both be 0
     // EFFECTS: Returns position of translated Chessboard coordinates
-    public String translatePosition(int columnTranslation, int rowTranslation) {
+    public Move translatePosition(int columnTranslation, int rowTranslation) {
         char column = currentPosition.charAt(0);
         char row = currentPosition.charAt(1);
 
@@ -190,7 +191,8 @@ public abstract class ChessPiece {
             // Source: https://stackoverflow.com/questions/2899301/how-do-i-increment-a-variable-to-the-next-or-previous-letter-in-the-alphabet
             char translatedColumn = (char) translatedColumnHash;
             char translatedRow = (char) translatedRowHash;
-            return translatedColumn + String.valueOf(translatedRow);
+            String targetBoardCoordinate = translatedColumn + String.valueOf(translatedRow);
+            return new Move(board, this, currentPosition, targetBoardCoordinate);
         }
         return null;
     }

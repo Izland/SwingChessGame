@@ -29,8 +29,9 @@ class RookTest {
     @Test
     public void testUpdateAvailableMoves() {
         String[] availableMoves = {"C7", "C8", "C5", "C4", "C3", "C2", "C1", "B6", "A6", "D6", "E6", "F6", "G6", "H6"};
-        HashSet<String> availableMoveSet = new HashSet<>(Arrays.asList(availableMoves));
-        testRook.updateAvailableMoves();
-        assertTrue(availableMoveSet.containsAll(testRook.availableMoves));
+        for (String targetBoardCoordinate : availableMoves) {
+            Move moveToTest = new Move(testBoard, testRook, testRook.currentPosition, targetBoardCoordinate);
+            assertTrue(testRook.availableMoves.contains(moveToTest));
+        }
     }
 }

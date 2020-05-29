@@ -216,31 +216,36 @@ public class BoardTest {
     @Test
     public void testMoveValid() {
         Player testPlayer = new Player("white");
-        assertTrue(testBoard.isMoveValid(testPlayer, "A2", "A3"));
+        Move testMove = new Move(testBoard, testBoard.getTile("A2").getOccupyingPiece(), "A2", "A3");
+        assertTrue(testBoard.isMoveValid(testPlayer, testMove));
     }
 
     @Test
     public void testMoveInvalidTeamPiece() {
         Player testPlayer = new Player("white");
-        assertFalse(testBoard.isMoveValid(testPlayer, "A7", "A6"));
+        Move testMove = new Move(testBoard, testBoard.getTile("A7").getOccupyingPiece(), "A7", "A6");
+        assertFalse(testBoard.isMoveValid(testPlayer, testMove));
     }
 
     @Test
     public void testMoveInvalidUnoccupiedSrcTile() {
         Player testPlayer = new Player("white");
-        assertFalse(testBoard.isMoveValid(testPlayer, "A5", "A6"));
+        Move testMove = new Move(testBoard, testBoard.getTile("A5").getOccupyingPiece(), "A5", "A6");
+        assertFalse(testBoard.isMoveValid(testPlayer, testMove));
     }
 
     @Test
     public void testMoveInvalidUnavailableMove() {
         Player testPlayer = new Player("white");
-        assertFalse(testBoard.isMoveValid(testPlayer, "B1", "B3"));
+        Move testMove = new Move(testBoard, testBoard.getTile("B1").getOccupyingPiece(), "B1", "B3");
+        assertFalse(testBoard.isMoveValid(testPlayer, testMove));
     }
 
     @Test
     public void testMoveInvalidTargetOccupiedByTeam() {
         Player testPlayer = new Player("black");
-        assertFalse(testBoard.isMoveValid(testPlayer, "F8", "G7"));
+        Move testMove = new Move(testBoard, testBoard.getTile("F8").getOccupyingPiece(), "F8", "G7");
+        assertFalse(testBoard.isMoveValid(testPlayer, testMove));
     }
 
     @Test
@@ -249,8 +254,8 @@ public class BoardTest {
         Tile targetTile = testBoard.getTile("D3");
 
         ChessPiece testBishop = testBoard.getTile("C1").getOccupyingPiece();
-        assertFalse(testBishop.getAvailableMoves().contains("D2"));
-        assertFalse(testBishop.getAvailableMoves().contains("E3"));
+        assertFalse(testBishop.getAvailableMoves().contains(new Move(testBoard, testBishop, testBishop.getCurrentPosition(), "D2")));
+        assertFalse(testBishop.getAvailableMoves().contains(new Move(testBoard, testBishop, testBishop.getCurrentPosition(), "E3")));
 
         ChessPiece testPiece = srcTile.getOccupyingPiece();
         testPiece.currentPosition = "D3";
@@ -258,8 +263,8 @@ public class BoardTest {
         targetTile.setOccupyingPiece(testPiece);
         testBoard.updateAllPieceMoves();
 
-        assertTrue(testBishop.getAvailableMoves().contains("D2"));
-        assertTrue(testBishop.getAvailableMoves().contains("E3"));
+        assertTrue(testBishop.getAvailableMoves().contains(new Move(testBoard, testBishop, testBishop.getCurrentPosition(), "D2")));
+        assertTrue(testBishop.getAvailableMoves().contains(new Move(testBoard, testBishop, testBishop.getCurrentPosition(), "E3")));
 
 
 

@@ -31,8 +31,9 @@ class QueenTest {
     public void testUpdateAvailableMoves() {
         String[] availableMoves = {"C3", "B2", "A1", "C4", "B4", "A4", "C5", "B6", "A7", "D5", "D6", "D7", "D8", "D1", "D2", "D3", "E5", "F6", "G7", "H8", "E4", "F4", "G4", "H4",
         "E3", "F2", "G1"};
-        HashSet<String> availableMoveSet = new HashSet<>(Arrays.asList(availableMoves));
-        testQueen.updateAvailableMoves();
-        assertTrue(availableMoveSet.containsAll(testQueen.availableMoves));
+        for (String targetBoardCoordinate : availableMoves) {
+            Move moveToTest = new Move(testBoard, testQueen, testQueen.currentPosition, targetBoardCoordinate);
+            assertTrue(testQueen.availableMoves.contains(moveToTest));
+        }
     }
 }
