@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class Move {
     private final Board board;
-    private final ChessPiece cp;
+    private ChessPiece cp;
     private final String srcTileCoordinate;
     private final String targetTileCoordinate;
     private ChessPiece pieceOnTargetTile;
@@ -33,6 +33,10 @@ public class Move {
 
     public ChessPiece getPieceOnTargetTile() {
         return pieceOnTargetTile;
+    }
+
+    public void setChessPiece(ChessPiece cp) {
+        this.cp = cp;
     }
 
     public boolean isThereACaptureMove() {
@@ -68,5 +72,14 @@ public class Move {
     @Override
     public int hashCode() {
         return Objects.hash(srcTileCoordinate, targetTileCoordinate);
+    }
+
+    @Override
+    public String toString() {
+        return "Move{" +
+                "cp=" + cp +
+                ", srcTileCoordinate='" + srcTileCoordinate + '\'' +
+                ", targetTileCoordinate='" + targetTileCoordinate + '\'' +
+                '}';
     }
 }

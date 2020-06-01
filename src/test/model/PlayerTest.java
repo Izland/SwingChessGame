@@ -8,13 +8,16 @@ import static org.junit.jupiter.api.Assertions.*;
 // Tests for Player Class
 public class PlayerTest {
 
+    Game testGame;
     Player testPlayer;
     Player testPlayer2;
 
     @BeforeEach
     public void setup() {
-        testPlayer = new Player("white");
-        testPlayer2 = new Player("black", "Bill", false);
+        testGame = new Game();
+        testGame.initializeGame(false);
+        testPlayer = new HumanPlayer(testGame, "white");
+        testPlayer2 = new HumanPlayer(testGame,"black", "Bill", false);
     }
 
     @Test

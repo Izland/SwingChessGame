@@ -17,15 +17,17 @@ public abstract class ChessPiece {
     protected String colour;
     protected ArrayList<Move> availableMoves;
     protected Board board;
+    protected int pointValue;
 
     // EFFECTS: Creates a chesspiece and initializes the piece's starting moves
-    public ChessPiece(Board board, String pieceType, String pieceID, String currentPosition, String colour) {
+    public ChessPiece(Board board, String pieceType, String pieceID, String currentPosition, String colour, int pointValue) {
         this.board = board;
         this.pieceType = pieceType;
         this.pieceID = pieceID;
         this.currentPosition = currentPosition;
         this.colour = colour;
         availableMoves = new ArrayList<>();
+        this.pointValue = pointValue;
         this.updateAvailableMoves();
     }
 
@@ -46,6 +48,8 @@ public abstract class ChessPiece {
     public String getPieceID() {
         return pieceID;
     }
+
+    public int getPointValue() { return pointValue;}
 
     public ArrayList<Move> getAvailableMoves() {
         return availableMoves;
@@ -205,5 +209,14 @@ public abstract class ChessPiece {
     // EFFECTS: Updates the pieces current board position to targetBoardSquare
     public void updateLocation(String targetBoardSquare) {
         currentPosition = targetBoardSquare;
+    }
+
+    @Override
+    public String toString() {
+        return "ChessPiece{" +
+                "pieceType='" + pieceType + '\'' +
+                ", currentPosition='" + currentPosition + '\'' +
+                ", colour='" + colour + '\'' +
+                '}';
     }
 }

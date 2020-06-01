@@ -39,4 +39,11 @@ public class Tile {
         return occupyingPiece.getColour().equals(p.getTeamColour());
     }
 
+    @Override
+    public String toString() {
+        return "Tile{" +
+                "boardCoordinate='" + boardCoordinate + '\'' +
+                ", occupyingPiece=" + occupyingPiece +
+                '}';
+    }
 }

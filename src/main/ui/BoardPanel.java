@@ -161,9 +161,10 @@ public class BoardPanel extends JPanel {
     // MODIFIES: srcPanel
     // EFFECTS: Removes the red border from the srcPanel when called and updates the images on both panels
     public void updatePanelsAfterMove() {
-        srcTilePanel.setBorder(null);
-        srcTilePanel.refreshTileImage();
-        targetTilePanel.refreshTileImage();
+        for (TilePanel tp : tilePanelList) {
+            tp.setBorder(null);
+            tp.refreshTileImage();
+        }
     }
 
 }

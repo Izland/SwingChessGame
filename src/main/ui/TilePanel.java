@@ -63,7 +63,7 @@ public class TilePanel extends JPanel {
             } else if (srcTile != null && !tile.isOccupiedByTeam(activePlayer)) {
                 board.setTargetTile(tile);
                 boardPanel.setTargetTilePanel(this);
-                if (game.makeMove()) {
+                if (activePlayer.makeMove()) {
                     // https://stackoverflow.com/questions/7117332/dynamically-remove-component-from-jpanel
                     // https://stackoverflow.com/questions/13859348/how-to-hide-or-remove-a-jlabel
                     new MP3Player(new File("data/piece-sound-effect-2.mp3")).play();

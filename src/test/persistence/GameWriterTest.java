@@ -1,9 +1,6 @@
 package persistence;
 
-import model.Board;
-import model.ChessPiece;
-import model.Game;
-import model.Player;
+import model.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,9 +19,10 @@ public class GameWriterTest {
     @BeforeEach
     public void setup() {
         playersToWrite = new ArrayList<>();
-        playersToWrite.add(new Player("white", "Joe", true));
-        playersToWrite.add(new Player("black", "Mama", false));
         gameToWrite = new Game();
+        gameToWrite.initializeGame(false);
+        playersToWrite.add(new HumanPlayer(gameToWrite, "white", "Joe", true));
+        playersToWrite.add(new HumanPlayer(gameToWrite, "black", "Mama", false));
     }
 
     @Test

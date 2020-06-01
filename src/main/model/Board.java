@@ -14,6 +14,8 @@ public class Board {
     private Tile srcTile;
     private Tile targetTile;
     private ArrayList<Move> movePool;
+    private ArrayList<Move> whiteMovePool;
+    private ArrayList<Move> blackMovePool;
 
     // EFFECTS: Constructs a Board object
     public Board() {
@@ -49,6 +51,14 @@ public class Board {
 
     public ArrayList<Tile> getBoardTiles() {
         return boardTiles;
+    }
+
+    public ArrayList<Move> getWhiteMovePool() {
+        return whiteMovePool;
+    }
+
+    public ArrayList<Move> getBlackMovePool() {
+        return blackMovePool;
     }
 
     public void setSrcTile(Tile srcTile) {
@@ -136,10 +146,11 @@ public class Board {
         int whiteTeamScore = 0;
         int blackTeamScore = 0;
         for (ChessPiece cp : pieces) {
+            int pointValue = cp.getPointValue();
             if (cp.getColour().equals("white")) {
-                whiteTeamScore++;
+                whiteTeamScore += pointValue;
             } else {
-                blackTeamScore++;
+                blackTeamScore += pointValue;
             }
         }
         return whiteTeamScore - blackTeamScore;
@@ -156,7 +167,7 @@ public class Board {
         Tile targetTile = boardTileMap.get(targetCoordinate);
         ChessPiece pieceToDestroy = targetTile.getOccupyingPiece();
 
-        ChessPiece cp = srcTile.getOccupyingPiece();
+        ChessPiece cp = move.getChessPiece();
         srcTile.setOccupyingPiece(null);
         targetTile.setOccupyingPiece(cp);
         cp.updateLocation(targetCoordinate);
@@ -172,9 +183,16 @@ public class Board {
     // EFFECTS: Updates every piece's available moves
     public void updateAllPieceMoves() {
         movePool = new ArrayList<>();
+        whiteMovePool = new ArrayList<>();
+        blackMovePool = new ArrayList<>();
         for (ChessPiece p : pieces) {
             p.updateAvailableMoves();
             movePool.addAll(p.getAvailableMoves());
+            if (p.getColour().equals("white")) {
+                whiteMovePool.addAll(p.getAvailableMoves());
+            } else {
+                blackMovePool.addAll(p.getAvailableMoves());
+            }
         }
     }
 

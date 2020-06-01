@@ -12,12 +12,15 @@ import static org.junit.jupiter.api.Assertions.*;
 // Tests for Board class
 public class BoardTest {
 
+    Game testGame;
     Board testBoard;
     ArrayList<ChessPiece> pieces;
 
     @BeforeEach
     public void setup() {
-        testBoard = new Board();
+        testGame = new Game();
+        testGame.initializeGame(false);
+        testBoard = testGame.getBoard();
         testBoard.initPieces();
         pieces = createTestChessPieces();
     }
@@ -215,35 +218,35 @@ public class BoardTest {
 
     @Test
     public void testMoveValid() {
-        Player testPlayer = new Player("white");
+        Player testPlayer = new HumanPlayer(testGame, "white");
         Move testMove = new Move(testBoard, testBoard.getTile("A2").getOccupyingPiece(), "A2", "A3");
         assertTrue(testBoard.isMoveValid(testPlayer, testMove));
     }
 
     @Test
     public void testMoveInvalidTeamPiece() {
-        Player testPlayer = new Player("white");
+        Player testPlayer = new HumanPlayer(testGame, "white");
         Move testMove = new Move(testBoard, testBoard.getTile("A7").getOccupyingPiece(), "A7", "A6");
         assertFalse(testBoard.isMoveValid(testPlayer, testMove));
     }
 
     @Test
     public void testMoveInvalidUnoccupiedSrcTile() {
-        Player testPlayer = new Player("white");
+        Player testPlayer = new HumanPlayer(testGame, "white");
         Move testMove = new Move(testBoard, testBoard.getTile("A5").getOccupyingPiece(), "A5", "A6");
         assertFalse(testBoard.isMoveValid(testPlayer, testMove));
     }
 
     @Test
     public void testMoveInvalidUnavailableMove() {
-        Player testPlayer = new Player("white");
+        Player testPlayer = new HumanPlayer(testGame, "white");
         Move testMove = new Move(testBoard, testBoard.getTile("B1").getOccupyingPiece(), "B1", "B3");
         assertFalse(testBoard.isMoveValid(testPlayer, testMove));
     }
 
     @Test
     public void testMoveInvalidTargetOccupiedByTeam() {
-        Player testPlayer = new Player("black");
+        Player testPlayer = new HumanPlayer(testGame, "black");
         Move testMove = new Move(testBoard, testBoard.getTile("F8").getOccupyingPiece(), "F8", "G7");
         assertFalse(testBoard.isMoveValid(testPlayer, testMove));
     }

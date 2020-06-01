@@ -2,6 +2,7 @@ package ui;
 
 
 import com.sun.jdi.JDIPermission;
+import model.AI;
 import model.Game;
 import model.Player;
 import persistence.GameParser;
@@ -12,6 +13,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 // The main game UI class
 public class  GameFrame extends JFrame {
@@ -22,6 +25,9 @@ public class  GameFrame extends JFrame {
     private String firstPlayerName;
     private String secondPlayerName;
     private boolean isActiveGame;
+    private boolean isOnePlayerGame;
+    private Player activePlayer;
+
 
     // EFFECTS: Creates a GameFrame object
     public GameFrame() {
@@ -32,6 +38,8 @@ public class  GameFrame extends JFrame {
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         initMenuBar();
         this.setVisible(true);
+        isOnePlayerGame = false;
+        activePlayer = null;
     }
 
     // Getters and setters
@@ -66,6 +74,7 @@ public class  GameFrame extends JFrame {
     private void initGame() {
         isActiveGame = true;
         game = new Game();
+        game.initializeGame(isOnePlayerGame);
         game.getPlayers().get(0).setName(this.firstPlayerName);
         game.getPlayers().get(1).setName(this.secondPlayerName);
         configurePanels(game);
@@ -81,6 +90,7 @@ public class  GameFrame extends JFrame {
         JButton b1 = new JButton("One Player");
         JButton b2 = new JButton("Two Players");
         b1.addActionListener(e -> {
+            isOnePlayerGame = true;
             initNameDialog(1);
             d.setVisible(false);
         });
@@ -145,7 +155,11 @@ public class  GameFrame extends JFrame {
         JButton okButton = new JButton("Ok");
         okButton.addActionListener(e -> {
             this.firstPlayerName = firstPlayerName.getText();
-            this.secondPlayerName = secondPlayerName.getText();
+            if (secondPlayerName.getText().isEmpty()) {
+                this.secondPlayerName = "Jarvis";
+            } else {
+                this.secondPlayerName = secondPlayerName.getText();
+            }
             initGame();
             d.setVisible(false);
         });
@@ -260,21 +274,38 @@ public class  GameFrame extends JFrame {
 
     public void update() {
         boardPanel.updatePanelsAfterMove();
+        activePlayer = game.getActivePlayer();
         gameInfoPanel.updateActivePlayer();
 
         if (game.canAPawnBeConverted()) {
-            createConversionDialog();
-
+            if (game.getInactivePlayer().getClass().equals(AI.class)) {
+                String tileLocation = game.getPawnToConvert().getCurrentPosition();
+                game.convertPawn("queen");
+                boardPanel.refreshTilePanel(tileLocation);
+            } else {
+                createConversionDialog();
+            }
         }
         if (game.isInCheck()) {
             if (game.checkForWinCondition()) {
                 isActiveGame = false;
                 gameInfoPanel.updateWinner();
+                return;
             } else {
                 gameInfoPanel.addCheck();
             }
         } else {
             gameInfoPanel.removeCheck();
+        }
+
+        if (game.checkForWinCondition()) {
+            isActiveGame = false;
+            gameInfoPanel.updateWinner();
+            return;
+        }
+        if (isOnePlayerGame && activePlayer.getClass().equals(AI.class)) {
+            activePlayer.makeMove();
+            update();
         }
     }
 

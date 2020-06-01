@@ -7,7 +7,7 @@ public class Bishop extends ChessPiece {
     // colour should be either "white" or "black"
     // EFFECTS: Constructs a bishop chess piece
     public Bishop(Board board, String pieceID, String currentPosition, String colour) {
-        super(board, "bishop", pieceID, currentPosition, colour);
+        super(board, "bishop", pieceID, currentPosition, colour, 30);
     }
 
     @Override

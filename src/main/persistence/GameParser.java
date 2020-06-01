@@ -15,7 +15,7 @@ public class GameParser {
 
     // REQUIRES: JSONArray should only have two players
     // EFFECTS: Turns JSONArray into ArrayList full of players and returns it
-    public static ArrayList<Player> generatePlayerArrayList(JSONArray players) {
+    public static ArrayList<Player> generatePlayerArrayList(Game game, JSONArray players) {
         ArrayList<Player> arrayToReturn = new ArrayList<>();
 
         for (Object o : players) {
@@ -23,8 +23,15 @@ public class GameParser {
             String name = (String) playerObject.get("name");
             String teamColour = (String) playerObject.get("teamColour");
             boolean isPlayersTurn = (boolean) playerObject.get("isPlayersTurn");
+            boolean isAi = (boolean) playerObject.get("isAi");
+            Player p;
 
-            Player p = new Player(teamColour, name, isPlayersTurn);
+            if  (isAi) {
+                p = new AI(game, teamColour, name, isPlayersTurn);
+            } else {
+                p = new HumanPlayer(game, teamColour, name, isPlayersTurn);
+            }
+
             arrayToReturn.add(p);
         }
         return arrayToReturn;
@@ -69,14 +76,16 @@ public class GameParser {
         // https://howtodoinjava.com/library/json-simple-read-write-json-examples/#write-json-file
         JSONParser jsonParser = new JSONParser();
         try (FileReader reader = new FileReader(fileLocation)) {
+            Game game = new Game();
             Board board = new Board();
             JSONObject saveDataObject = (JSONObject) jsonParser.parse(reader);
             JSONArray jsonPieces = (JSONArray) saveDataObject.get("pieces");
             JSONArray jsonPlayers = (JSONArray) saveDataObject.get("players");
-            ArrayList<Player> players = generatePlayerArrayList(jsonPlayers);
+            ArrayList<Player> players = generatePlayerArrayList(game, jsonPlayers);
             ArrayList<ChessPiece> pieces = genChessPieceArrayList(board, jsonPieces);
             board.loadPieces(pieces);
-            return new Game(players, board);
+            game.loadGame(players, board);
+            return game;
         } catch (IOException | ParseException e) {
             System.out.println(e);
             return null;

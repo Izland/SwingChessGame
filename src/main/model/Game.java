@@ -8,27 +8,12 @@ public class Game {
     private ArrayList<Player> players;
     private Board board;
     private Player activePlayer;
+    private Player inactivePlayer;
     private boolean inCheck;
     private King whiteKing;
     private King blackKing;
     private String winner;
     private ChessPiece pawnToConvert;
-
-    public Game() {
-        this.players = new ArrayList<>();
-        this.board = new Board();
-        initializePlayers();
-        board.initPieces();
-        board.updateAllPieceMoves();
-        findKings();
-    }
-
-    public Game(ArrayList<Player> players, Board board) {
-        loadPlayers(players);
-        this.board = board;
-        findKings();
-        updateCheckState();
-    }
 
     // Getters and setters
 
@@ -52,6 +37,10 @@ public class Game {
         return winner;
     }
 
+    public Player getInactivePlayer() {
+        return inactivePlayer;
+    }
+
     public void setBoard(Board board) {
         this.board = board;
     }
@@ -66,7 +55,7 @@ public class Game {
 
     // MODIFIES: this
     // EFFECTS: Checks to see if any pawn has made it to the end.
-    private void checkForPawnToConvert() {
+    protected void checkForPawnToConvert() {
         for (ChessPiece cp : board.getPieces()) {
             String rowNumber = cp.getCurrentPosition().substring(1);
             if (cp.getPieceType().equals("pawn") && (rowNumber.equals("1") || rowNumber.equals("8"))) {
@@ -78,17 +67,22 @@ public class Game {
     // MODIFIES: this
     // EFFECTS: Checks to see if any move is possible and if not, sets the winner and returns true; false otherwise
     public boolean checkForWinCondition() {
-        if (board.getMovePool().isEmpty()) {
-            for (Player p : players) {
-                if (!p.equals(activePlayer)) {
-                    winner = p.getName();
-                    return true;
-                }
+        boolean checkMateWhite = true;
+        boolean checkMateBlack = true;
+        for (Move m : board.getWhiteMovePool()) {
+            if (checkMove(m)) {
+                checkMateWhite = false;
+                break;
             }
         }
-        return false;
+        for (Move m : board.getBlackMovePool()) {
+            if (checkMove(m)) {
+                checkMateBlack = false;
+                break;
+            }
+        }
+        return checkMateWhite || checkMateBlack;
     }
-
 
     // EFFECTS: Returns true if move will not cause active player to be in check
     public boolean checkMove(Move move) {
@@ -142,12 +136,36 @@ public class Game {
         return String.valueOf(highestPieceID);
     }
 
+    public void initializeGame(boolean isThereAi) {
+        board = new Board();
+        board.initPieces();
+        board.updateAllPieceMoves();
+        winner = null;
+        initializePlayers(isThereAi);
+        findKings();
+    }
+
     // MODIFIES: this
     // EFFECTS: Creates 2 players and adds them to game
-    public void initializePlayers() {
-        players.add(new Player("white"));
-        players.add(new Player("black"));
+    public void initializePlayers(boolean isThereAI) {
+        players = new ArrayList<>();
+        if (isThereAI) {
+            players.add(new HumanPlayer(this, "white"));
+            players.add(new AI(this, "black"));
+        } else {
+            players.add(new HumanPlayer(this, "white"));
+            players.add(new HumanPlayer(this, "black"));
+        }
+
         activePlayer = players.get(0);
+        inactivePlayer = players.get(1);
+    }
+
+    public void loadGame(ArrayList<Player> players, Board board) {
+        loadPlayers(players);
+        this.board = board;
+        findKings();
+        updateCheckState();
     }
 
     // MODIFIES: this
@@ -157,29 +175,10 @@ public class Game {
         for (Player p : players) {
             if (p.getPlayersTurn()) {
                 activePlayer = p;
+            } else {
+                inactivePlayer = p;
             }
         }
-    }
-
-    // MODIFIES: this
-    // EFFECTS: Returns true if a successful move is made (move is in pool of available moves), false otherwise
-    public boolean makeMove() {
-        Tile srcTile = board.getSrcTile();
-        Tile targetTile = board.getTargetTile();
-        String srcTileBoardCoordinate = srcTile.getBoardCoordinate();
-        String targetTileBoardCoordinate = targetTile.getBoardCoordinate();
-        ChessPiece srcPiece = srcTile.getOccupyingPiece();
-        Move move = new Move(board, srcPiece, srcTileBoardCoordinate, targetTileBoardCoordinate);
-
-        if (board.getMovePool().contains(move) && checkMove(move)) {
-            move.executeMove();
-            checkForPawnToConvert();
-            board.updateAllPieceMoves();
-            updateCheckState();
-            swapActivePlayer();
-            return true;
-        }
-        return false;
     }
 
     // MODIFIES: this
@@ -188,8 +187,10 @@ public class Game {
         activePlayer.setPlayersTurn(false);
         if (players.get(0).equals(activePlayer)) {
             activePlayer = players.get(1);
+            inactivePlayer = players.get(0);
         } else {
             activePlayer = players.get(0);
+            inactivePlayer = players.get(1);
         }
         activePlayer.setPlayersTurn(true);
     }
@@ -202,9 +203,15 @@ public class Game {
             for (Move move : cp.getAvailableMoves()) {
                 if (move.getTargetTileCoordinate().equals(whiteKing.getCurrentPosition())) {
                     inCheck = true;
+                    for (Move m : board.getWhiteMovePool()) {
+                        System.out.println(m);
+                    }
                     return;
                 } else if (move.getTargetTileCoordinate().equals(blackKing.getCurrentPosition())) {
                     inCheck = true;
+                    for (Move m : board.getBlackMovePool()) {
+                        System.out.println(m);
+                    }
                     return;
                 }
             }

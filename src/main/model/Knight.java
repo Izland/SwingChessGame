@@ -7,7 +7,7 @@ public class Knight extends ChessPiece {
     // colour should be either "white" or "black"
     // EFFECTS: Constructs a knight chess piece
     public Knight(Board board, String pieceID, String currentPosition, String colour) {
-        super(board, "knight", pieceID, currentPosition, colour);
+        super(board, "knight", pieceID, currentPosition, colour, 30);
     }
 
     @Override

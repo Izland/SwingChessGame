@@ -73,7 +73,8 @@ public class GameParserTest {
 
     @Test
     public void testGeneratePlayerArrayList() {
-        ArrayList<Player> players = GameParser.generatePlayerArrayList(playerJsonArray);
+        Game testGame = new Game();
+        ArrayList<Player> players = GameParser.generatePlayerArrayList(testGame, playerJsonArray);
 
         Player playerOne = players.get(0);
         Player playerTwo = players.get(1);

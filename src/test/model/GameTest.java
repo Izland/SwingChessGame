@@ -11,16 +11,20 @@ public class GameTest {
 
     Game testGame;
     Game testGame2;
+    Board testBoard;
     ArrayList<Player> testPlayers;
 
     @BeforeEach
     public void setup() {
-        testPlayers = new ArrayList<>();
-        testPlayers.add(new Player("white", "Chuck", false));
-        testPlayers.add(new Player("black", "Paul", true));
-
         testGame = new Game();
-        testGame2 = new Game(testPlayers, new Board());
+        testGame.initializeGame(false);
+
+        testGame2 = new Game();
+        testBoard = new Board();
+        testPlayers = new ArrayList<>();
+        testPlayers.add(new HumanPlayer(testGame, "white", "Chuck", false));
+        testPlayers.add(new HumanPlayer(testGame, "black", "Paul", true));
+        testGame2.loadGame(testPlayers, testBoard);
     }
 
     @Test
@@ -42,12 +46,14 @@ public class GameTest {
     @Test
     public void testMakeMoveValid() {
         Board testBoard = testGame.getBoard();
+        Player player1 = testGame.getPlayers().get(0);
         Tile srcTile = testBoard.getTile("D2");
         Tile targetTile = testBoard.getTile("D3");
         ChessPiece srcPiece = srcTile.getOccupyingPiece();
         testBoard.setSrcTile(srcTile);
         testBoard.setTargetTile(targetTile);
-        assertTrue(testGame.makeMove());
+
+        assertTrue(player1.makeMove());
         assertNull(srcTile.getOccupyingPiece());
         assertEquals(srcPiece, targetTile.getOccupyingPiece());
     }
@@ -55,12 +61,14 @@ public class GameTest {
     @Test
     public void testMakeMoveInvalid() {
         Board testBoard = testGame.getBoard();
+        Player player1 = testGame.getPlayers().get(0);
+
         Tile srcTile = testBoard.getTile("D2");
         Tile targetTile = testBoard.getTile("G5");
         assertTrue(srcTile.isOccupied());
         testBoard.setSrcTile(srcTile);
         testBoard.setTargetTile(targetTile);
-        assertFalse(testGame.makeMove());
+        assertFalse(player1.makeMove());
         assertNotNull(srcTile.getOccupyingPiece());
         assertNull(targetTile.getOccupyingPiece());
     }
@@ -70,6 +78,7 @@ public class GameTest {
 
         // setup
         Board testBoard = testGame.getBoard();
+        Player player1 = testGame.getPlayers().get(1);
 
         // Remove original king
         ChessPiece ogKing = testBoard.getTile("E8").getOccupyingPiece();
@@ -94,7 +103,7 @@ public class GameTest {
         Tile targetTile = testBoard.getTile("D4");
         testBoard.setSrcTile(srcTile);
         testBoard.setTargetTile(targetTile);
-        assertTrue(testGame.makeMove());
+        assertTrue(player1.makeMove());
         assertEquals("D4", testKing.getCurrentPosition());
 
         // Take game out of check
@@ -108,6 +117,7 @@ public class GameTest {
     public void testMakeMoveInCheckKingMove() {
         // setup
         Board testBoard = testGame.getBoard();
+        Player player1 = testGame.getPlayers().get(1);
 
         // Remove original king
         ChessPiece ogKing = testBoard.getTile("E8").getOccupyingPiece();
@@ -132,7 +142,7 @@ public class GameTest {
         Tile targetTile = testBoard.getTile("F6");
         testBoard.setSrcTile(srcTile);
         testBoard.setTargetTile(targetTile);
-        assertTrue(testGame.makeMove());
+        assertTrue(player1.makeMove());
         assertEquals("F6", testKing.getCurrentPosition());
 
         // Take game out of check
@@ -144,6 +154,7 @@ public class GameTest {
     public void testMakeMoveUnsuccessfulKingMove() {
         // setup
         Board testBoard = testGame.getBoard();
+        Player player1 = testGame.getPlayers().get(0);
 
         // Remove original king
         ChessPiece ogKing = testBoard.getTile("E8").getOccupyingPiece();
@@ -167,7 +178,7 @@ public class GameTest {
         Tile targetTile = testBoard.getTile("F6");
         testBoard.setSrcTile(srcTile);
         testBoard.setTargetTile(targetTile);
-        assertFalse(testGame.makeMove());
+        assertFalse(player1.makeMove());
         assertEquals("E5", testKing.getCurrentPosition());
 
         // Game should still be in check
@@ -178,6 +189,7 @@ public class GameTest {
     @Test
     public void testMakeMovePieceThatDoesNotBlockCheckPath() {
         // setup
+        Player player1 = testGame.getPlayers().get(0);
         Board testBoard = testGame.getBoard();
 
         // Remove original king
@@ -203,7 +215,7 @@ public class GameTest {
         Tile targetTile = testBoard.getTile("B6");
         testBoard.setSrcTile(srcTile);
         testBoard.setTargetTile(targetTile);
-        assertFalse(testGame.makeMove());
+        assertFalse(player1.makeMove());
         assertEquals("B7", testPawn.getCurrentPosition());
 
         // Game should still be in check
@@ -215,6 +227,7 @@ public class GameTest {
     public void testMakeMoveFriendlyPieceThatBlocksCheckPath() {
         // setup
         Board testBoard = testGame.getBoard();
+        Player player1 = testGame.getPlayers().get(1);
 
         // Remove original king
         ChessPiece ogKing = testBoard.getTile("E8").getOccupyingPiece();
@@ -241,7 +254,7 @@ public class GameTest {
         Tile targetTile = testBoard.getTile("E5");
         testBoard.setSrcTile(srcTile);
         testBoard.setTargetTile(targetTile);
-        assertTrue(testGame.makeMove());
+        assertTrue(player1.makeMove());
         assertEquals("E5", testPawn.getCurrentPosition());
 
         // Game should no longer be in check
@@ -253,6 +266,7 @@ public class GameTest {
     public void testMakeMovePieceThatBlocksCheckPath() {
         // setup
         Board testBoard = testGame.getBoard();
+        Player player1 = testGame.getPlayers().get(1);
 
         // Remove original king
         ChessPiece ogKing = testBoard.getTile("E8").getOccupyingPiece();
@@ -279,7 +293,7 @@ public class GameTest {
         Tile targetTile = testBoard.getTile("E5");
         testBoard.setSrcTile(srcTile);
         testBoard.setTargetTile(targetTile);
-        assertTrue(testGame.makeMove());
+        assertTrue(player1.makeMove());
         assertEquals("E5", testPawn.getCurrentPosition());
 
         // Game should no longer be in check
@@ -292,6 +306,7 @@ public class GameTest {
     public void testMakeMoveCapturePieceThatCausesCheck() {
         // setup
         Board testBoard = testGame.getBoard();
+        Player player1 = testGame.getPlayers().get(1);
 
         // Remove original king
         ChessPiece ogKing = testBoard.getTile("E8").getOccupyingPiece();
@@ -318,7 +333,7 @@ public class GameTest {
         Tile targetTile = testBoard.getTile("D4");
         testBoard.setSrcTile(srcTile);
         testBoard.setTargetTile(targetTile);
-        assertTrue(testGame.makeMove());
+        assertTrue(player1.makeMove());
         assertEquals("D4", testPawn.getCurrentPosition());
 
         // Game should no longer be in check

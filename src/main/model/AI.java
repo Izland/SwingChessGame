@@ -2,121 +2,125 @@ package model;
 
 import java.util.ArrayList;
 
-public class AI{
+public class AI extends Player{
 
-    private Game game;
-    private Board gameBoard;
     private Board aiBoard;
-    private String name;
-    private String teamColour;
-    private boolean isPlayersTurn;
-    private ArrayList<Move> aiGameMovePool;
+    private ArrayList<Integer> treeValues;
+    private Move moveToDo;
 
-    public AI(Game game) {
-        this.game = game;
-        gameBoard = game.getBoard();
+
+    public AI(Game game, String teamColour) {
+        super(game, teamColour, true);
         name = "Jarvis";
-        teamColour = "black";
-        isPlayersTurn = false;
-        aiBoard = new Board();
-        aiGameMovePool = new ArrayList<>();
-        aiBoard = generateAIBoard(gameBoard);
-        aiGameMovePool = generateAIGameMovePool(aiBoard);
+        initializePlayersTurn();
+        aiBoard = generateNewBoard(board);
+        treeValues = new ArrayList<>();
     }
 
-    private Board generateAIBoard(Board board) {
+    public AI(Game game, String teamColour, String name, boolean isPlayersTurn) {
+        super(game, teamColour, name, isPlayersTurn, true);
+        aiBoard = generateNewBoard(board);
+    }
+
+    private Board generateNewBoard(Board board) {
         Board generatedBoard = new Board();
         for (ChessPiece cp : board.getPieces()) {
             ChessPiece simulatedPiece = switch (cp.getPieceType()) {
-                case "pawn" -> new Pawn(aiBoard, cp.getPieceID(), cp.getCurrentPosition(), cp.getColour());
-                case "rook" -> new Rook(aiBoard, cp.getPieceID(), cp.getCurrentPosition(), cp.getColour());
-                case "bishop" -> new Bishop(aiBoard, cp.getPieceID(), cp.getCurrentPosition(), cp.getColour());
-                case "queen" -> new Queen(aiBoard, cp.getPieceID(), cp.getCurrentPosition(), cp.getColour());
-                default -> new King(aiBoard, cp.getCurrentPosition(), cp.getColour());
+                case "pawn" -> new Pawn(generatedBoard, cp.getPieceID(), cp.getCurrentPosition(), cp.getColour());
+                case "rook" -> new Rook(generatedBoard, cp.getPieceID(), cp.getCurrentPosition(), cp.getColour());
+                case "knight" -> new Knight(generatedBoard, cp.getPieceID(), cp.getCurrentPosition(), cp.getColour());
+                case "bishop" -> new Bishop(generatedBoard, cp.getPieceID(), cp.getCurrentPosition(), cp.getColour());
+                case "queen" -> new Queen(generatedBoard, cp.getPieceID(), cp.getCurrentPosition(), cp.getColour());
+                default -> new King(generatedBoard, cp.getCurrentPosition(), cp.getColour());
             };
             generatedBoard.assignPiece(simulatedPiece, simulatedPiece.getCurrentPosition());
         }
+        generatedBoard.updateAllPieceMoves();
         return generatedBoard;
     }
 
-    private ArrayList<Move> generateAIGameMovePool(Board board) {
-        ArrayList<Move> movePool = new ArrayList<>();
-        for (ChessPiece cp : board.getPieces()) {
-            movePool.addAll(cp.getAvailableMoves());
-        }
-        return movePool;
-    }
-
-    public Move minimax() {
-        Move moveToExecute = null;
+    public Move minimax(int depthToReach) {
+        Board generatedBoard = generateNewBoard(board);
         if (teamColour.equals("white")) {
-            int maxInt = Integer.MIN_VALUE;
-
-            for (Move move: aiGameMovePool) {
-                move.executeMove();
-                int moveValue = maxi(3);
-                move.reverseMove();
-                if (moveValue > maxInt) {
-                    moveToExecute = move;
-                }
-
-            }
+            maxi(0, depthToReach, true, generatedBoard);
         } else {
-            int minInt = Integer.MAX_VALUE;
-
-            for (Move move: aiGameMovePool) {
-                aiBoard.move(move);
-                int moveValue = maxi(3);
-                move.reverseMove();
-                if (moveValue < minInt) {
-                    moveToExecute = move;
-                }
-
-            }
+            mini(0, depthToReach, true, generatedBoard);
         }
-        return moveToExecute;
+        ChessPiece realPiece = board.getTile(moveToDo.getSrcTileCoordinate()).getOccupyingPiece();
+        moveToDo = new Move(game.getBoard(), realPiece, moveToDo.getSrcTileCoordinate(), moveToDo.getTargetTileCoordinate());
+        System.out.println(treeValues);
+        return moveToDo;
     }
 
-    // EFFECTS: Represents the white player's optimized move value
-    public int maxi(int depth) {
-        if (depth == 0) {
-            return aiBoard.evaluateBoardState();
+    public int maxi(int depth, int depthToReach, boolean isPlayersTurn, Board currentStateBoard) {
+        if (depth == depthToReach) {
+            int nodeValue = currentStateBoard.evaluateBoardState();
+            treeValues.add(nodeValue);
+            return nodeValue;
         }
+
         int max = Integer.MIN_VALUE;
-        ArrayList<Move> modifiableGamePool = generateAIGameMovePool(aiBoard);
-        for (ChessPiece cp : aiBoard.getPieces())
-        for (Move move : modifiableGamePool) {
-            // Initial Move
-            move.executeMove();
+        for (Move move : currentStateBoard.getMovePool()) {
+            String srcPieceColour = move.getChessPiece().getColour();
+            if ((srcPieceColour.equals(teamColour) && isPlayersTurn) || (!srcPieceColour.equals(teamColour) && !isPlayersTurn)) {
+                move.executeMove();
+                Board boardToPass = generateNewBoard(currentStateBoard);
 
-            int moveScore = mini(depth - 1);
-            max = Integer.max(max, moveScore);
+                int moveScore = mini(depth + 1, depthToReach, !isPlayersTurn, boardToPass);
 
-            // Reverse Move
-            move.reverseMove();
+                if (moveScore > max) {
+                    max = moveScore;
+                    if (depth == 0) {
+                        moveToDo = move;
+                    }
+                }
+                move.reverseMove();
+            }
         }
+
         return max;
     }
 
-    // EFFECTS: Represents the black player's optimized move value
-    public int mini(int depth) {
-        if (depth == 0) {
-            return aiBoard.evaluateBoardState();
+    public int mini(int depth, int depthToReach, boolean isPlayersTurn, Board currentStateBoard) {
+        if (depth == depthToReach) {
+            int nodeValue = currentStateBoard.evaluateBoardState();
+            treeValues.add(nodeValue);
+            return nodeValue;
         }
+
         int min = Integer.MAX_VALUE;
-        ArrayList<Move> modifiableGamePool = generateAIGameMovePool(aiBoard);
-        for (Move move : modifiableGamePool) {
+        for (Move move : currentStateBoard.getMovePool()) {
+            String srcPieceColour = move.getChessPiece().getColour();
+            if ((srcPieceColour.equals(teamColour) && isPlayersTurn) || (!srcPieceColour.equals(teamColour) && !isPlayersTurn)) {
+                move.executeMove();
+                Board boardToPass = generateNewBoard(currentStateBoard);
 
-            // Initial Move
-            move.executeMove();
+                int moveScore = maxi(depth + 1, depthToReach, !isPlayersTurn, boardToPass);
 
-            int moveScore = maxi(depth - 1);
-            min = Integer.min(min, moveScore);
-
-            // Reverse Move
-            move.reverseMove();
+                if (moveScore < min) {
+                    min = moveScore;
+                    if (depth == 0) {
+                        moveToDo = move;
+                    }
+                }
+                move.reverseMove();
+            }
         }
+
         return min;
+    }
+
+    @Override
+    public boolean makeMove() {
+        aiBoard = generateNewBoard(board);
+        Move moveToMake = minimax(3);
+
+        // Change the move's object to the real board object instead of the aiBoard one
+        moveToMake.executeMove();
+        game.checkForPawnToConvert();
+        game.updateCheckState();
+        game.swapActivePlayer();
+        return true;
     }
 
 }
