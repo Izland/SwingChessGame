@@ -10,7 +10,7 @@ Note: Special moves such as castling and en passant have not been implemented ye
 
 Things I'd like to work on:
 
--Optimize move generation algorithm
+-Optimize move generation algorithm (Add bitboards potentially?)
 
 -Allow special types of moves (Castling, en passant)
 
