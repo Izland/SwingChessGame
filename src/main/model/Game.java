@@ -41,6 +41,24 @@ public class Game {
         return inactivePlayer;
     }
 
+    public Player getWhitePlayer() {
+        for (Player p : players) {
+            if (p.getTeamColour().equals("white")) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    public Player getBlackPlayer() {
+        for (Player p : players) {
+            if (p.getTeamColour().equals("black")) {
+                return p;
+            }
+        }
+        return null;
+    }
+
     public void setBoard(Board board) {
         this.board = board;
     }
@@ -67,21 +85,43 @@ public class Game {
     // MODIFIES: this
     // EFFECTS: Checks to see if any move is possible and if not, sets the winner and returns true; false otherwise
     public boolean checkForWinCondition() {
-        boolean checkMateWhite = true;
-        boolean checkMateBlack = true;
+        ArrayList<Move> whiteMovePool = board.getWhiteMovePool();
+        ArrayList<Move> blackMovePool = board.getBlackMovePool();
+        boolean whiteCheckMate = true;
+        boolean blackCheckMate = true;
+
+        // If the movepool is just empty
+        if (whiteMovePool.isEmpty() && inCheck) {
+            winner = getBlackPlayer().getName();
+            return true;
+        } else if (blackMovePool.isEmpty() && inCheck) {
+            winner = getWhitePlayer().getName();
+            return true;
+
+            // Stalemate scenario
+        } else if (whiteMovePool.isEmpty() || blackMovePool.isEmpty()) {
+            winner = "Stalemate";
+            return true;
+        }
+
         for (Move m : board.getWhiteMovePool()) {
             if (checkMove(m)) {
-                checkMateWhite = false;
+                whiteCheckMate = false;
                 break;
             }
         }
         for (Move m : board.getBlackMovePool()) {
             if (checkMove(m)) {
-                checkMateBlack = false;
+                blackCheckMate = false;
                 break;
             }
         }
-        return checkMateWhite || checkMateBlack;
+        if (whiteCheckMate) {
+            winner = getBlackPlayer().getName();
+        } else if (blackCheckMate) {
+            winner = getWhitePlayer().getName();
+        }
+        return whiteCheckMate || blackCheckMate;
     }
 
     // EFFECTS: Returns true if move will not cause active player to be in check
@@ -102,7 +142,7 @@ public class Game {
             default -> new Queen(board, "queen" + getHighestPieceID("queen"), pawnLocation, pawnToConvert.getColour());
         };
         board.getPieces().remove(pawnToConvert);
-        board.assignPiece(convertedPiece, pawnLocation);
+        board.assignPiece(convertedPiece);
         board.updateAllPieceMoves();
         updateCheckState();
         pawnToConvert = null;
@@ -203,15 +243,9 @@ public class Game {
             for (Move move : cp.getAvailableMoves()) {
                 if (move.getTargetTileCoordinate().equals(whiteKing.getCurrentPosition())) {
                     inCheck = true;
-                    for (Move m : board.getWhiteMovePool()) {
-                        System.out.println(m);
-                    }
                     return;
                 } else if (move.getTargetTileCoordinate().equals(blackKing.getCurrentPosition())) {
                     inCheck = true;
-                    for (Move m : board.getBlackMovePool()) {
-                        System.out.println(m);
-                    }
                     return;
                 }
             }

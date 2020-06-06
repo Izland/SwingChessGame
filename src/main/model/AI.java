@@ -1,11 +1,9 @@
 package model;
 
-import java.util.ArrayList;
+// Represents a computer player
 
-public class AI extends Player{
+public class AI extends Player {
 
-    private Board aiBoard;
-    private ArrayList<Integer> treeValues;
     private Move moveToDo;
 
 
@@ -13,15 +11,13 @@ public class AI extends Player{
         super(game, teamColour, true);
         name = "Jarvis";
         initializePlayersTurn();
-        aiBoard = generateNewBoard(board);
-        treeValues = new ArrayList<>();
     }
 
     public AI(Game game, String teamColour, String name, boolean isPlayersTurn) {
         super(game, teamColour, name, isPlayersTurn, true);
-        aiBoard = generateNewBoard(board);
     }
 
+    // EFFECTS: Creates a deep copy of the board passed in.
     private Board generateNewBoard(Board board) {
         Board generatedBoard = new Board();
         for (ChessPiece cp : board.getPieces()) {
@@ -39,24 +35,26 @@ public class AI extends Player{
         return generatedBoard;
     }
 
+    // REQUIRES: depthToReach should not currently be set to more than 3 until further testing can be done.
+    // MODIFIES: this
+    // EFFECTS: Evaluates every possible move that each player can make up to the given depth and chooses the move that creates the most value
     public Move minimax(int depthToReach) {
         Board generatedBoard = generateNewBoard(board);
         if (teamColour.equals("white")) {
-            maxi(0, depthToReach, true, generatedBoard);
+            maxi(0, depthToReach, Integer.MIN_VALUE, Integer.MAX_VALUE, true, generatedBoard);
         } else {
-            mini(0, depthToReach, true, generatedBoard);
+            mini(0, depthToReach, Integer.MIN_VALUE, Integer.MAX_VALUE, true, generatedBoard);
         }
         ChessPiece realPiece = board.getTile(moveToDo.getSrcTileCoordinate()).getOccupyingPiece();
         moveToDo = new Move(game.getBoard(), realPiece, moveToDo.getSrcTileCoordinate(), moveToDo.getTargetTileCoordinate());
-        System.out.println(treeValues);
         return moveToDo;
     }
 
-    public int maxi(int depth, int depthToReach, boolean isPlayersTurn, Board currentStateBoard) {
+    // MODIFIES: this
+    // EFFECTS: Iterates through all the possible moves and finds the one that maximizes the board state point value
+    public int maxi(int depth, int depthToReach, int alpha, int beta, boolean isPlayersTurn, Board currentStateBoard) {
         if (depth == depthToReach) {
-            int nodeValue = currentStateBoard.evaluateBoardState();
-            treeValues.add(nodeValue);
-            return nodeValue;
+            return currentStateBoard.evaluateBoardState();
         }
 
         int max = Integer.MIN_VALUE;
@@ -66,7 +64,7 @@ public class AI extends Player{
                 move.executeMove();
                 Board boardToPass = generateNewBoard(currentStateBoard);
 
-                int moveScore = mini(depth + 1, depthToReach, !isPlayersTurn, boardToPass);
+                int moveScore = mini(depth + 1, depthToReach, alpha, beta,  !isPlayersTurn, boardToPass);
 
                 if (moveScore > max) {
                     max = moveScore;
@@ -75,17 +73,21 @@ public class AI extends Player{
                     }
                 }
                 move.reverseMove();
+                alpha = Integer.min(beta, moveScore);
+                if (beta <= alpha) {
+                    break;
+                }
             }
         }
 
         return max;
     }
 
-    public int mini(int depth, int depthToReach, boolean isPlayersTurn, Board currentStateBoard) {
+    // MODIFIES: this
+    // EFFECTS: Iterates through all the possible moves and finds the one that minimizes the board state point value
+    public int mini(int depth, int depthToReach, int alpha, int beta, boolean isPlayersTurn, Board currentStateBoard) {
         if (depth == depthToReach) {
-            int nodeValue = currentStateBoard.evaluateBoardState();
-            treeValues.add(nodeValue);
-            return nodeValue;
+            return currentStateBoard.evaluateBoardState();
         }
 
         int min = Integer.MAX_VALUE;
@@ -95,7 +97,7 @@ public class AI extends Player{
                 move.executeMove();
                 Board boardToPass = generateNewBoard(currentStateBoard);
 
-                int moveScore = maxi(depth + 1, depthToReach, !isPlayersTurn, boardToPass);
+                int moveScore = maxi(depth + 1, depthToReach, alpha, beta, !isPlayersTurn, boardToPass);
 
                 if (moveScore < min) {
                     min = moveScore;
@@ -104,6 +106,10 @@ public class AI extends Player{
                     }
                 }
                 move.reverseMove();
+                beta = Integer.min(beta, moveScore);
+                if (beta <= alpha) {
+                    break;
+                }
             }
         }
 
@@ -111,8 +117,8 @@ public class AI extends Player{
     }
 
     @Override
+    // EFFECTS: Finds the move to make, executes it, and then updates the game
     public boolean makeMove() {
-        aiBoard = generateNewBoard(board);
         Move moveToMake = minimax(3);
 
         // Change the move's object to the real board object instead of the aiBoard one

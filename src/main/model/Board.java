@@ -110,7 +110,7 @@ public class Board {
             // Source: https://unicode-table.com/en/#0031
             String pawnCoord = (char) (i + 64) + rowID;
             Pawn p = new Pawn(this,"pawn" + i, pawnCoord, teamColour);
-            assignPiece(p, pawnCoord);
+            assignPiece(p);
         }
     }
 
@@ -124,24 +124,33 @@ public class Board {
         } else {
             rowID = "8";
         }
-        assignPiece(new Rook(this, "rook1", "A" + rowID, teamColour), "A" + rowID);
-        assignPiece(new Rook(this, "rook2", "H" + rowID, teamColour), "H" + rowID);
-        assignPiece(new Knight(this,"knight1", "B" + rowID, teamColour), "B" + rowID);
-        assignPiece(new Knight(this, "knight2", "G" + rowID, teamColour), "G" + rowID);
-        assignPiece(new Bishop(this,"bishop1", "C" + rowID, teamColour), "C" + rowID);
-        assignPiece(new Bishop(this,"bishop2", "F" + rowID, teamColour), "F" + rowID);
-        assignPiece(new Queen(this,"queen1", "D" + rowID, teamColour), "D" + rowID);
-        assignPiece(new King(this,"E" + rowID, teamColour), "E" + rowID);
+        assignPiece(new Rook(this, "rook1", "A" + rowID, teamColour));
+        assignPiece(new Rook(this, "rook2", "H" + rowID, teamColour));
+        assignPiece(new Knight(this,"knight1", "B" + rowID, teamColour));
+        assignPiece(new Knight(this, "knight2", "G" + rowID, teamColour));
+        assignPiece(new Bishop(this,"bishop1", "C" + rowID, teamColour));
+        assignPiece(new Bishop(this,"bishop2", "F" + rowID, teamColour));
+        assignPiece(new Queen(this,"queen1", "D" + rowID, teamColour));
+        assignPiece(new King(this,"E" + rowID, teamColour));
     }
 
     // MODIFIES: this, Tile t
     // EFFECTS: Assigns a piece to its respective starting tile and adds it to the board
-    public void assignPiece(ChessPiece piece, String tileCoordinate) {
-        Tile t = getTile(tileCoordinate);
+    public void assignPiece(ChessPiece piece) {
+        Tile t = getTile(piece.getCurrentPosition());
         t.setOccupyingPiece(piece);
         pieces.add(piece);
     }
 
+    // MODIFIES: this, Tile t
+    // EFFECTS: Assigns a piece to its respective starting tile and adds it to the board
+    public void assignPiece(ChessPiece piece, String targetCoordinate) {
+        Tile t = getTile(targetCoordinate);
+        t.setOccupyingPiece(piece);
+        pieces.add(piece);
+    }
+
+    // EFFECTS: Sums up the total point value of both the white pieces and the black pieces and returns the difference
     public int evaluateBoardState() {
         int whiteTeamScore = 0;
         int blackTeamScore = 0;
@@ -205,7 +214,7 @@ public class Board {
             t.setOccupyingPiece(null);
         }
         for (ChessPiece cp : piecesToLoad) {
-            assignPiece(cp, cp.getCurrentPosition());
+            assignPiece(cp);
         }
         updateAllPieceMoves();
     }

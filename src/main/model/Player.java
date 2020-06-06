@@ -63,10 +63,4 @@ public abstract class Player {
         isPlayersTurn = teamColour.equals("white");
     }
 
-
-
-
-
-
-
 }

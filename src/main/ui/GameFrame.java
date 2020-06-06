@@ -287,13 +287,7 @@ public class  GameFrame extends JFrame {
             }
         }
         if (game.isInCheck()) {
-            if (game.checkForWinCondition()) {
-                isActiveGame = false;
-                gameInfoPanel.updateWinner();
-                return;
-            } else {
-                gameInfoPanel.addCheck();
-            }
+            gameInfoPanel.addCheck();
         } else {
             gameInfoPanel.removeCheck();
         }

@@ -6,12 +6,15 @@ This application is designed so that either 1 or 2 people can play chess on a co
 **Anyone interested in chess that knows the rules of chess and is capable of using a computer will be able to
 use this application**, and hopefully have fun doing it.
 
-Things being worked on:
+Note: Special moves such as castling and en passant have not been implemented yet.
 
--assignPiece() might be able to just use the piece's current location instead of another parameter
+Things I'd like to work on:
+
+-Optimize move generation algorithm
+
+-Allow special types of moves (Castling, en passant)
 
 -Change variables to have local unique names instead of similar global variable names
 
--Add a computer AI to play against
 
 
